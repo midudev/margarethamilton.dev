@@ -191,7 +191,7 @@ const t = translator(getLang(Astro));
 
 	// One seek at a time: if scrolling outpaces the decoder, it jumps straight to the last requested frame
 	const seek = () => {
-		if (seeking || film.readyState < 1) return;
+		if (seeking || film.readyState < 2) return;
 		const target = Math.min(frame, Math.floor(film.duration * FPS) - 1);
 		if (Math.floor(film.currentTime * FPS) === target) return;
 		seeking = true;
@@ -208,24 +208,26 @@ const t = translator(getLang(Astro));
 		} catch {
 			film.src = src;
 		}
+		prime();
+	}
+
+	// iOS ignores preload="auto": it only loads the metadata, never fires loadeddata and doesn't
+	// paint seeks until the video has played. A muted play() makes it load the frames.
+	// Low Power Mode rejects it, so it tries again on the next tap
+	function prime() {
+		film.play().then(
+			() => {
+				film.pause();
+				seek();
+			},
+			() => addEventListener('touchend', prime, { once: true, passive: true }),
+		);
 	}
 
 	film.addEventListener('seeked', () => {
 		seeking = false;
 		seek();
 	});
-	// iOS doesn't paint seeks in a video that has never been played
-	film.addEventListener(
-		'loadeddata',
-		() => {
-			film
-				.play()
-				.then(() => film.pause())
-				.catch(() => {})
-				.finally(seek);
-		},
-		{ once: true },
-	);
 
 	onProgress(scene, (p) => {
 		if (!loading) {
