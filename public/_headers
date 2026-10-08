@@ -1,0 +1,5 @@
+# Cloudflare static assets headers: https://developers.cloudflare.com/workers/static-assets/headers/
+# Files in /_astro/ have a content hash in their name, so they never change: repeat visits
+# use them straight from the cache instead of revalidating each one
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

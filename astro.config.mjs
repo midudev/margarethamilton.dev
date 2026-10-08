@@ -4,6 +4,8 @@ import { defineConfig, fontProviders } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://margarethamilton.dev',
+	// A single page: inlining the CSS saves the round trip that blocks the first paint
+	build: { inlineStylesheets: 'always' },
 	i18n: {
 		locales: ['es', 'en'],
 		defaultLocale: 'es',
