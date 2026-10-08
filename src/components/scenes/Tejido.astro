@@ -1,0 +1,197 @@
+---
+import { Image } from 'astro:assets';
+import rope from '../../assets/photos/rope-memory.jpg';
+import { getLang, translator } from '../../i18n';
+
+const lang = getLang(Astro);
+const t = translator(lang);
+
+// 1202 (octal) en binario: un hilo que pasa por dentro (1) o por fuera (0) de cada núcleo
+const bits = '001010000010'.split('').map(Number);
+const X0 = 70;
+const STEP = 88;
+const CY = 120;
+const LOW = 196;
+const RX = 11;
+const RY = 36;
+
+const cores = bits.map((bit, i) => ({ bit, x: X0 + i * STEP, c: (i + 0.5) / bits.length }));
+const ys = bits.map((bit) => (bit ? CY : LOW));
+const endX = X0 + (bits.length - 1) * STEP + 70;
+
+let wire = `M 0 ${ys[0]} L ${X0 - 50} ${ys[0]}`;
+cores.forEach(({ x }, i) => {
+	const prevX = i === 0 ? X0 - 50 : cores[i - 1].x + 24;
+	const prevY = i === 0 ? ys[0] : ys[i - 1];
+	wire += ` C ${prevX + 22} ${prevY} ${x - 46} ${ys[i]} ${x - 24} ${ys[i]} L ${x + 24} ${ys[i]}`;
+});
+wire += ` L ${endX} ${ys[ys.length - 1]}`;
+
+// Cada núcleo es un anillo visto de canto: la mitad izquierda queda detrás del hilo y la derecha, delante
+const arc = (x: number, back: boolean) =>
+	back
+		? `M ${x} ${CY - RY} A ${RX} ${RY} 0 0 0 ${x} ${CY + RY}`
+		: `M ${x} ${CY - RY} A ${RX} ${RY} 0 0 1 ${x} ${CY + RY}`;
+---
+
+<section class="scene tejido" data-scene="tejido" data-theme="copper" data-year="1969" style="--len: 520">
+	<div class="stage">
+		<div class="layer photo" style="--a: 0.62">
+			<Image
+				src={rope}
+				alt={t({
+					es: 'Un módulo de memoria de cuerda del ordenador del Apollo: cientos de núcleos de ferrita atravesados por hilos de cobre',
+					en: 'A core rope memory module from the Apollo computer: hundreds of ferrite cores threaded with copper wire',
+				})}
+				widths={[664]}
+			/>
+		</div>
+
+		<svg class="rope layer" style="--a: 0.24; --b: 0.62" viewBox={`0 0 ${endX} 270`} aria-hidden="true">
+			{cores.map(({ x }) => <path class="core" d={arc(x, true)} />)}
+			<path class="wire" d={wire} pathLength="1" />
+			{cores.map(({ x }) => <path class="core front" d={arc(x, false)} />)}
+			{
+				cores.map(({ x, bit, c }) => (
+					<text class="bit" x={x} y="262" style={`--c:${c.toFixed(3)}`}>
+						{bit}
+					</text>
+				))
+			}
+		</svg>
+
+		<div class="text stack">
+			<p class="beat" data-beat="0 0.14">{t({ es: 'El software no se instalaba.', en: 'Software wasn’t installed.' })}</p>
+			<p class="beat big" data-beat="0.14 0.26">{t({ es: 'Se tejía.', en: 'It was woven.' })}</p>
+			<p class="beat" data-beat="0.26 0.5">
+				{
+					t({
+						es: 'Un hilo que atraviesa un núcleo es un 1. Uno que lo esquiva, un 0.',
+						en: 'A wire through a core is a 1. A wire around it, a 0.',
+					})
+				}
+			</p>
+			<p class="beat" data-beat="0.5 0.62">
+				{
+					lang === 'es' ? (
+						<>Este hilo escribe <span class="mono">1202</span>, el número de la alarma, en binario.</>
+					) : (
+						<>This wire spells <span class="mono">1202</span>, the alarm code, in binary.</>
+					)
+				}
+			</p>
+			<p class="beat" data-beat="0.62 0.8">
+				{
+					t({
+						es: 'Lo tejían a mano, sobre todo mujeres, en una fábrica de Raytheon.',
+						en: 'It was woven by hand, mostly by women, at a Raytheon factory.',
+					})
+				}
+			</p>
+			<p class="beat" data-beat="0.8">
+				{
+					t({
+						es: 'Una vez tejido, no se podía cambiar. Tenía que estar bien a la primera.',
+						en: 'Once woven, it couldn’t be changed. It had to be right the first time.',
+					})
+				}
+			</p>
+		</div>
+	</div>
+</section>
+
+<style>
+	.photo {
+		display: grid;
+		place-items: center;
+		padding: 10vh var(--gutter) 34vh;
+	}
+
+	.photo img {
+		width: min(100%, 760px);
+		height: auto;
+		filter: sepia(0.25) saturate(1.1);
+		box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+	}
+
+	.rope {
+		--w: clamp(0, calc((var(--p, 1) - 0.27) / 0.2), 1);
+		inset: 14vh var(--gutter) auto;
+		width: calc(100% - 2 * var(--gutter));
+		height: auto;
+		max-height: 46vh;
+	}
+
+	.core {
+		fill: none;
+		stroke: #5b544d;
+		stroke-width: 11;
+	}
+
+	.core.front {
+		stroke: #6f675f;
+	}
+
+	.wire {
+		fill: none;
+		stroke: var(--hilo);
+		stroke-width: 3;
+		stroke-linecap: round;
+		stroke-dasharray: 1;
+		stroke-dashoffset: calc(1 - var(--w));
+		filter: drop-shadow(0 0 6px rgb(217 138 78 / 0.5));
+	}
+
+	.bit {
+		font-family: var(--font-mono);
+		font-size: 22px;
+		text-anchor: middle;
+		fill: var(--fg);
+		opacity: clamp(0, calc((var(--w) - var(--c)) * 20), 1);
+	}
+
+	.text {
+		position: absolute;
+		left: var(--gutter);
+		right: var(--gutter);
+		bottom: clamp(3.5rem, 12vh, 8rem);
+		align-items: end;
+	}
+
+	.text p {
+		max-width: 24ch;
+		font-size: var(--t-lead);
+		line-height: 1.12;
+		letter-spacing: -0.015em;
+		text-wrap: pretty;
+	}
+
+	.text .big {
+		font-size: var(--t-giant);
+		font-weight: 300;
+		font-style: italic;
+		line-height: 0.95;
+	}
+
+	.text .mono {
+		font-size: 0.8em;
+		color: var(--hilo);
+	}
+
+	@media (max-width: 760px) {
+		.text p:not(.big) {
+			font-size: 1.35rem;
+		}
+
+		.rope {
+			inset: 18vh 0 auto;
+			width: 100%;
+		}
+	}
+
+	html:not(.js) .text,
+	html:not(.js) .layer {
+		position: relative;
+		inset: auto;
+	}
+</style>
