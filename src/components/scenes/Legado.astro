@@ -225,205 +225,207 @@ const icons: Record<string, string> = {
 <section class="scene legado" data-scene="legado" data-theme="wall" data-year="1976" style="--len: 900">
 	<div class="stage">
 		<div class="layer profile-layer" style={`--b: ${PHOTO + 0.03}`}>
-			<div class="window">
-				<div class="bar" aria-hidden="true">
-					<i></i><i></i><i></i>
-					<span class="url">linkedin.com/in/margarethamilton</span>
-				</div>
+			<div class="slot">
+				<div class="window">
+					<div class="bar" aria-hidden="true">
+						<i></i><i></i><i></i>
+						<span class="url">linkedin.com/in/margarethamilton</span>
+					</div>
 
-				<div class="nav" aria-hidden="true">
-					<span class="in">in</span>
-					<span class="search"><svg viewBox="0 0 24 24" set:html={icons.search} />{t({ es: 'Buscar', en: 'Search' })}</span>
-					<span class="nav-items">
-						<span><svg viewBox="0 0 24 24" set:html={icons.home} /><small>{t({ es: 'Inicio', en: 'Home' })}</small></span>
-						<span><svg viewBox="0 0 24 24" set:html={icons.network} /><small>{t({ es: 'Mi red', en: 'My Network' })}</small></span>
-						<span><svg viewBox="0 0 24 24" set:html={icons.jobs} /><small>{t({ es: 'Empleos', en: 'Jobs' })}</small></span>
-						<span>
-							<svg viewBox="0 0 24 24" set:html={icons.bell} />
-							<small>{t({ es: 'Notificaciones', en: 'Notifications' })}</small>
-							<span class="badge">{badges.map((beat, i) => <span data-beat={beat}>{i + 1}</span>)}</span>
+					<div class="nav" aria-hidden="true">
+						<span class="in">in</span>
+						<span class="search"><svg viewBox="0 0 24 24" set:html={icons.search} />{t({ es: 'Buscar', en: 'Search' })}</span>
+						<span class="nav-items">
+							<span><svg viewBox="0 0 24 24" set:html={icons.home} /><small>{t({ es: 'Inicio', en: 'Home' })}</small></span>
+							<span><svg viewBox="0 0 24 24" set:html={icons.network} /><small>{t({ es: 'Mi red', en: 'My Network' })}</small></span>
+							<span><svg viewBox="0 0 24 24" set:html={icons.jobs} /><small>{t({ es: 'Empleos', en: 'Jobs' })}</small></span>
+							<span>
+								<svg viewBox="0 0 24 24" set:html={icons.bell} />
+								<small>{t({ es: 'Notificaciones', en: 'Notifications' })}</small>
+								<span class="badge">{badges.map((beat, i) => <span data-beat={beat}>{i + 1}</span>)}</span>
+							</span>
 						</span>
-					</span>
-				</div>
+					</div>
 
-				<div class="viewport" data-viewport>
-					<article
-						class="page"
-						data-page
-						aria-label={t({ es: 'El perfil de LinkedIn que habría tenido Margaret Hamilton', en: 'The LinkedIn profile Margaret Hamilton would have had' })}
-					>
-						<section class="card top" data-beat="0" data-pan="start">
-							<div class="banner">
-								<Image src={banner} alt="" widths={[640, 1280]} sizes="(max-width: 760px) 92vw, 36rem" />
-							</div>
-							<div class="avatar" data-beat={b(AVATAR)} data-pan="start">
-								<Image src={avatar1969} alt={t({ es: 'Margaret Hamilton en 1969', en: 'Margaret Hamilton in 1969' })} widths={[160, 320]} sizes="140px" />
-								<Image
-									src={avatar1989}
-									alt={t({ es: 'Margaret Hamilton en 1989', en: 'Margaret Hamilton in 1989' })}
-									widths={[160, 320]}
-									sizes="140px"
-									data-beat={b(AVATAR)}
-								/>
-							</div>
-							<div class="intro">
-								<h3 class="name">Margaret Hamilton <small>{t({ es: 'Ella', en: 'She/Her' })}</small></h3>
-								<p class="swap headline">{headlines.map(({ beat, text }) => <span data-beat={beat}>{text}</span>)}</p>
-								<p class="dim">
-									{t({ es: 'Cambridge, Massachusetts, Estados Unidos', en: 'Cambridge, Massachusetts, United States' })} ·{' '}
-									<span class="link">{t({ es: 'Información de contacto', en: 'Contact info' })}</span>
-								</p>
-								<p class="link">{t({ es: 'Más de 500 contactos', en: '500+ connections' })}</p>
-								<p class="actions" aria-hidden="true">
-									<span class="primary">{t({ es: 'Abierta a', en: 'Open to' })}</span>
-									<span>{t({ es: 'Añadir sección', en: 'Add section' })}</span>
-									<span>{t({ es: 'Más', en: 'More' })}</span>
-								</p>
-							</div>
-						</section>
-
-						<section class="card">
-							<h4>{t({ es: 'Experiencia', en: 'Experience' })}</h4>
-							<ul class="list">
-								{
-									experience.map((job) => (
-										<li class="entry" data-beat={job.at && b(job.at)} data-pan={job.at && 'end'}>
-											<div class="clip">
-												<div class="row">
-													{job.logo ? (
-														<span class="logo" style={`--bg:${job.logo.bg}`} aria-hidden="true">
-															{job.logo.text}
-														</span>
-													) : (
-														<span class="logo blank" aria-hidden="true">
-															<svg viewBox="0 0 24 24" set:html={icons.building} />
-														</span>
-													)}
-													<div>
-														<p class="title">{job.title}</p>
-														<p>{job.org}</p>
-														<p class="dim">
-															{job.dates.length > 1 ? (
-																<span class="swap">
-																	{job.dates.map(({ beat, text }) => (
-																		<span data-beat={beat}>{text}</span>
-																	))}
-																</span>
-															) : (
-																job.dates[0].text
-															)}
-														</p>
-														<p class="dim">{job.place}</p>
-														<p class="desc">{job.text}</p>
-													</div>
-												</div>
-											</div>
-										</li>
-									))
-								}
-							</ul>
-						</section>
-
-						<section class="card">
-							<h4>{t({ es: 'Educación', en: 'Education' })}</h4>
-							<div class="row">
-								<span class="logo" style="--bg:#7a1e2c" aria-hidden="true">EC</span>
-								<div>
-									<p class="title">Earlham College</p>
-									<p>
-										{
-											t({
-												es: 'Licenciatura en Matemáticas · Especialidad secundaria en Filosofía',
-												en: 'BA, Mathematics · Minor in Philosophy',
-											})
-										}
-									</p>
-									<p class="dim">1958</p>
+					<div class="viewport" data-viewport>
+						<article
+							class="page"
+							data-page
+							aria-label={t({ es: 'El perfil de LinkedIn que habría tenido Margaret Hamilton', en: 'The LinkedIn profile Margaret Hamilton would have had' })}
+						>
+							<section class="card top" data-beat="0" data-pan="start">
+								<div class="banner">
+									<Image src={banner} alt="" widths={[640, 1280]} sizes="(max-width: 760px) 92vw, 52rem" />
 								</div>
-							</div>
-						</section>
+								<div class="avatar" data-beat={b(AVATAR)} data-pan="start">
+									<Image src={avatar1969} alt={t({ es: 'Margaret Hamilton en 1969', en: 'Margaret Hamilton in 1969' })} widths={[160, 320]} sizes="140px" />
+									<Image
+										src={avatar1989}
+										alt={t({ es: 'Margaret Hamilton en 1989', en: 'Margaret Hamilton in 1989' })}
+										widths={[160, 320]}
+										sizes="140px"
+										data-beat={b(AVATAR)}
+									/>
+								</div>
+								<div class="intro">
+									<h3 class="name">Margaret Hamilton <small>{t({ es: 'Ella', en: 'She/Her' })}</small></h3>
+									<p class="swap headline">{headlines.map(({ beat, text }) => <span data-beat={beat}>{text}</span>)}</p>
+									<p class="dim">
+										{t({ es: 'Cambridge, Massachusetts, Estados Unidos', en: 'Cambridge, Massachusetts, United States' })} ·{' '}
+										<span class="link">{t({ es: 'Información de contacto', en: 'Contact info' })}</span>
+									</p>
+									<p class="link">{t({ es: 'Más de 500 contactos', en: '500+ connections' })}</p>
+									<p class="actions" aria-hidden="true">
+										<span class="primary">{t({ es: 'Abierta a', en: 'Open to' })}</span>
+										<span>{t({ es: 'Añadir sección', en: 'Add section' })}</span>
+										<span>{t({ es: 'Más', en: 'More' })}</span>
+									</p>
+								</div>
+							</section>
 
-						<section class="card" data-beat={b(SKILLS)} data-pan="start">
-							<h4>{t({ es: 'Aptitudes', en: 'Skills' })}</h4>
-							<ul class="list">
-								{
-									skills.map((skill) => (
-										<li class="row skill">
-											<div>
-												<p class="title">{skill.name}</p>
-												<p class="endorse">
-													{skill.faces && (
-														<span class="faces" aria-hidden="true">
-															{skill.faces.map((face) => (
-																<i>{face}</i>
-															))}
-														</span>
-													)}
-													{skill.note}
-												</p>
-											</div>
-										</li>
-									))
-								}
-							</ul>
-						</section>
-
-						<section class="card" data-beat={b(NASA)} data-pan="start">
-							<h4>{t({ es: 'Reconocimientos y premios', en: 'Honors & awards' })}</h4>
-							<ul class="list">
-								{
-									awards.map((award) => (
-										<li class="entry" data-beat={b(award.at)}>
-											<div class="clip">
-												<div class="row">
-													<span class="logo blank" aria-hidden="true">
-														<svg viewBox="0 0 24 24" set:html={icons.award} />
-													</span>
-													<div>
-														<p class="title">{award.title}</p>
-														<p class="dim">{award.issuer}</p>
-														<p class="desc">{award.text}</p>
+							<section class="card">
+								<h4>{t({ es: 'Experiencia', en: 'Experience' })}</h4>
+								<ul class="list">
+									{
+										experience.map((job) => (
+											<li class="entry" data-beat={job.at && b(job.at)} data-pan={job.at && 'end'}>
+												<div class="clip">
+													<div class="row">
+														{job.logo ? (
+															<span class="logo" style={`--bg:${job.logo.bg}`} aria-hidden="true">
+																{job.logo.text}
+															</span>
+														) : (
+															<span class="logo blank" aria-hidden="true">
+																<svg viewBox="0 0 24 24" set:html={icons.building} />
+															</span>
+														)}
+														<div>
+															<p class="title">{job.title}</p>
+															<p>{job.org}</p>
+															<p class="dim">
+																{job.dates.length > 1 ? (
+																	<span class="swap">
+																		{job.dates.map(({ beat, text }) => (
+																			<span data-beat={beat}>{text}</span>
+																		))}
+																	</span>
+																) : (
+																	job.dates[0].text
+																)}
+															</p>
+															<p class="dim">{job.place}</p>
+															<p class="desc">{job.text}</p>
+														</div>
 													</div>
 												</div>
-											</div>
-										</li>
-									))
-								}
-							</ul>
-						</section>
+											</li>
+										))
+									}
+								</ul>
+							</section>
 
-						<section class="card">
-							<h4>{t({ es: 'Idiomas', en: 'Languages' })}</h4>
-							<ul class="list">
-								{
-									languages.map((language) => (
-										<li class="row">
-											<div>
-												<p class="title">{language.name}</p>
-												<p class="dim">{language.level}</p>
-											</div>
-										</li>
-									))
-								}
-							</ul>
-						</section>
-					</article>
-				</div>
+							<section class="card">
+								<h4>{t({ es: 'Educación', en: 'Education' })}</h4>
+								<div class="row">
+									<span class="logo" style="--bg:#7a1e2c" aria-hidden="true">EC</span>
+									<div>
+										<p class="title">Earlham College</p>
+										<p>
+											{
+												t({
+													es: 'Licenciatura en Matemáticas · Especialidad secundaria en Filosofía',
+													en: 'BA, Mathematics · Minor in Philosophy',
+												})
+											}
+										</p>
+										<p class="dim">1958</p>
+									</div>
+								</div>
+							</section>
 
-				<div class="toasts" aria-hidden="true">
-					{
-						toasts.map((toast) => (
-							<div class="toast" data-beat={b(toast.from, toast.to)}>
-								<span class:list={['toast-icon', toast.icon === 'in' && 'brand']}>
-									{toast.icon === 'in' ? 'in' : <svg viewBox="0 0 24 24" set:html={icons[toast.icon]} />}
-								</span>
-								<p>
-									<strong>{toast.title}</strong>
-									{toast.text}
-								</p>
-							</div>
-						))
-					}
+							<section class="card" data-beat={b(SKILLS)} data-pan="start">
+								<h4>{t({ es: 'Aptitudes', en: 'Skills' })}</h4>
+								<ul class="list">
+									{
+										skills.map((skill) => (
+											<li class="row skill">
+												<div>
+													<p class="title">{skill.name}</p>
+													<p class="endorse">
+														{skill.faces && (
+															<span class="faces" aria-hidden="true">
+																{skill.faces.map((face) => (
+																	<i>{face}</i>
+																))}
+															</span>
+														)}
+														{skill.note}
+													</p>
+												</div>
+											</li>
+										))
+									}
+								</ul>
+							</section>
+
+							<section class="card" data-beat={b(NASA)} data-pan="start">
+								<h4>{t({ es: 'Reconocimientos y premios', en: 'Honors & awards' })}</h4>
+								<ul class="list">
+									{
+										awards.map((award) => (
+											<li class="entry" data-beat={b(award.at)}>
+												<div class="clip">
+													<div class="row">
+														<span class="logo blank" aria-hidden="true">
+															<svg viewBox="0 0 24 24" set:html={icons.award} />
+														</span>
+														<div>
+															<p class="title">{award.title}</p>
+															<p class="dim">{award.issuer}</p>
+															<p class="desc">{award.text}</p>
+														</div>
+													</div>
+												</div>
+											</li>
+										))
+									}
+								</ul>
+							</section>
+
+							<section class="card">
+								<h4>{t({ es: 'Idiomas', en: 'Languages' })}</h4>
+								<ul class="list">
+									{
+										languages.map((language) => (
+											<li class="row">
+												<div>
+													<p class="title">{language.name}</p>
+													<p class="dim">{language.level}</p>
+												</div>
+											</li>
+										))
+									}
+								</ul>
+							</section>
+						</article>
+					</div>
+
+					<div class="toasts" aria-hidden="true">
+						{
+							toasts.map((toast) => (
+								<div class="toast" data-beat={b(toast.from, toast.to)}>
+									<span class:list={['toast-icon', toast.icon === 'in' && 'brand']}>
+										{toast.icon === 'in' ? 'in' : <svg viewBox="0 0 24 24" set:html={icons[toast.icon]} />}
+									</span>
+									<p>
+										<strong>{toast.title}</strong>
+										{toast.text}
+									</p>
+								</div>
+							))
+						}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -548,16 +550,28 @@ const icons: Record<string, string> = {
 </script>
 
 <style>
-	.stage {
-		--card-w: min(36rem, 46vw);
+	/* Two columns, like the ending of the code scene: text on the left, the profile on the right */
+	.profile-layer,
+	.text {
+		display: grid;
+		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+		column-gap: clamp(2rem, 5vw, 6rem);
+		padding: 6vh var(--gutter);
+	}
+
+	.profile-layer {
+		align-items: center;
+	}
+
+	/* The window grows with its column, and its text with it */
+	.slot {
+		grid-column: 2;
+		display: grid;
+		justify-items: center;
+		container-type: inline-size;
 	}
 
 	/* The profile, in a browser window with LinkedIn's colors */
-	.profile-layer {
-		display: grid;
-		place-items: center end;
-		padding: 6vh var(--gutter);
-	}
 
 	.window {
 		--li-bg: #f4f2ee;
@@ -568,14 +582,14 @@ const icons: Record<string, string> = {
 		position: relative;
 		display: flex;
 		flex-direction: column;
-		width: var(--card-w);
-		height: min(86vh, 50rem);
+		width: min(100cqi, 52rem);
+		height: min(86vh, 56em);
 		overflow: hidden;
 		border-radius: 12px;
 		background: var(--li-bg);
 		color: var(--li-text);
 		font-family: -apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-		font-size: clamp(11px, 0.5rem + 0.6vw, 14px);
+		font-size: clamp(11px, min(100cqi, 52rem) / 46, 18px);
 		line-height: 1.4;
 		letter-spacing: normal;
 		text-align: left;
@@ -1079,22 +1093,25 @@ const icons: Record<string, string> = {
 
 	.text {
 		position: absolute;
-		left: var(--gutter);
-		right: calc(var(--card-w) + var(--gutter) * 2);
-		bottom: clamp(3.5rem, 12vh, 8rem);
+		inset: 0;
 		align-items: end;
+		justify-items: center;
+		padding-bottom: clamp(3.5rem, 12vh, 8rem);
+		pointer-events: none;
+	}
+
+	/* Same width for every caption, so they don't jump sideways from one to the next */
+	.text > p,
+	.quote {
+		width: min(100%, 22ch);
+		font-size: var(--t-lead);
 	}
 
 	.text p {
-		max-width: 22ch;
 		font-size: var(--t-lead);
 		line-height: 1.12;
 		letter-spacing: -0.015em;
 		text-wrap: pretty;
-	}
-
-	.quote p {
-		max-width: 28ch;
 	}
 
 	.quote footer {
@@ -1104,13 +1121,18 @@ const icons: Record<string, string> = {
 	}
 
 	@media (max-width: 760px) {
-		.stage {
-			--card-w: calc(100vw - var(--gutter) * 2);
+		.profile-layer,
+		.text {
+			grid-template-columns: minmax(0, 1fr);
 		}
 
 		.profile-layer {
-			place-items: start center;
+			align-items: start;
 			padding-top: 3.75rem;
+		}
+
+		.slot {
+			grid-column: 1;
 		}
 
 		.window {
@@ -1120,8 +1142,13 @@ const icons: Record<string, string> = {
 		}
 
 		.text {
-			right: var(--gutter);
-			bottom: clamp(2.75rem, 9vh, 5rem);
+			justify-items: start;
+			padding-bottom: clamp(2.75rem, 9vh, 5rem);
+		}
+
+		.text > p,
+		.quote {
+			width: auto;
 		}
 
 		.text p {
