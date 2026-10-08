@@ -4,6 +4,14 @@ import avatar1969 from '../../assets/photos/margaret-1969-avatar.jpg';
 import avatar1989 from '../../assets/photos/margaret-1989-avatar.jpg';
 import banner from '../../assets/photos/earth-over-moon.jpg';
 import medal from '../../assets/photos/medal-of-freedom-2016.jpg';
+import logoAwc from '../../assets/logos/awc.jpg';
+import logoEarlham from '../../assets/logos/earlham.png';
+import logoHos from '../../assets/logos/hos.png';
+import logoHti from '../../assets/logos/hti.png';
+import logoLincoln from '../../assets/logos/lincoln-lab.png';
+import logoMedal from '../../assets/logos/medal-of-freedom.jpg';
+import logoMit from '../../assets/logos/mit.svg';
+import logoNasa from '../../assets/logos/nasa.svg';
 import { getLang, translator } from '../../i18n';
 
 /**
@@ -38,12 +46,15 @@ const headlines = [
 	},
 ];
 
-const MIT = { text: 'MIT', bg: '#a31f34' };
+// Real logos: HOS and HTI come from their 1980s brochures, scanned by the Computer History Museum
+const MIT = { src: logoMit, pad: '0.6em' };
+/** Background and inner margin of each logo square */
+const logoStyle = ({ bg = '#fff', pad }: { bg?: string; pad: string }) => `--bg:${bg};--pad:${pad}`;
 
 const experience = [
 	{
 		at: HTI,
-		logo: { text: 'HTI', bg: '#1d4f91' },
+		logo: { src: logoHti, pad: '0.28em' },
 		title: t({ es: 'Fundadora y CEO', en: 'Founder & CEO' }),
 		org: 'Hamilton Technologies, Inc.',
 		dates: [{ text: t({ es: 'mar. 1986 – actualidad', en: 'Mar 1986 – Present' }) }],
@@ -55,7 +66,7 @@ const experience = [
 	},
 	{
 		at: HOS,
-		logo: { text: 'HOS', bg: '#3b3f46' },
+		logo: { src: logoHos, bg: '#fff905', pad: '0.2em' },
 		title: t({ es: 'Cofundadora y CEO', en: 'Co-founder & CEO' }),
 		org: 'Higher Order Software',
 		dates: [
@@ -83,7 +94,7 @@ const experience = [
 		}),
 	},
 	{
-		logo: { text: 'LL', bg: '#28466e' },
+		logo: { src: logoLincoln, pad: '0.4em' },
 		title: t({ es: 'Programadora · Proyecto SAGE', en: 'Programmer · SAGE project' }),
 		org: 'MIT Lincoln Laboratory',
 		dates: [{ text: '1961 – 1963' }],
@@ -139,12 +150,14 @@ const skills = [
 const awards = [
 	{
 		at: MEDAL,
+		logo: { src: logoMedal, pad: '0em' },
 		title: t({ es: 'Medalla Presidencial de la Libertad', en: 'Presidential Medal of Freedom' }),
 		issuer: t({ es: 'Otorgado por el presidente Barack Obama · nov. 2016', en: 'Issued by President Barack Obama · Nov 2016' }),
 		text: t({ es: 'La mayor distinción civil de Estados Unidos.', en: 'The highest civilian honor in the United States.' }),
 	},
 	{
 		at: NASA,
+		logo: { src: logoNasa, pad: '0.28em' },
 		title: 'NASA Exceptional Space Act Award',
 		issuer: t({ es: 'Otorgado por la NASA · 2003', en: 'Issued by NASA · 2003' }),
 		text: t({
@@ -154,6 +167,7 @@ const awards = [
 	},
 	{
 		at: HTI,
+		logo: { src: logoAwc, pad: '0.2em' },
 		title: 'Augusta Ada Lovelace Award',
 		issuer: t({
 			es: 'Otorgado por la Association for Women in Computing · 1986',
@@ -218,7 +232,6 @@ const icons: Record<string, string> = {
 	camera: '<path fill-rule="evenodd" d="M8.5 4h7l1.5 2.5h3A1.5 1.5 0 0 1 21.5 8v10.5A1.5 1.5 0 0 1 20 20H4a1.5 1.5 0 0 1-1.5-1.5V8A1.5 1.5 0 0 1 4 6.5h3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>',
 	eye: '<path fill-rule="evenodd" d="M12 5c6.5 0 10 7 10 7s-3.5 7-10 7S2 12 2 12s3.5-7 10-7zm0 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><circle cx="12" cy="12" r="2"/>',
 	building: '<path d="M5 21V4.5L13 3v18zm9.5 0V9H19v12zM7.5 7v2h2V7zm0 4v2h2v-2zm0 4v2h2v-2z" fill-rule="evenodd"/>',
-	award: '<circle cx="12" cy="9" r="6"/><path d="m8 14-2 8 6-3 6 3-2-8a7.5 7.5 0 0 1-8 0z"/>',
 };
 ---
 
@@ -292,8 +305,8 @@ const icons: Record<string, string> = {
 												<div class="clip">
 													<div class="row">
 														{job.logo ? (
-															<span class="logo" style={`--bg:${job.logo.bg}`} aria-hidden="true">
-																{job.logo.text}
+															<span class="logo" style={logoStyle(job.logo)}>
+																<Image src={job.logo.src} alt="" width={160} />
 															</span>
 														) : (
 															<span class="logo blank" aria-hidden="true">
@@ -328,7 +341,9 @@ const icons: Record<string, string> = {
 							<section class="card">
 								<h4>{t({ es: 'Educación', en: 'Education' })}</h4>
 								<div class="row">
-									<span class="logo" style="--bg:#7a1e2c" aria-hidden="true">EC</span>
+									<span class="logo" style={logoStyle({ pad: '0.4em' })}>
+										<Image src={logoEarlham} alt="" width={160} />
+									</span>
 									<div>
 										<p class="title">Earlham College</p>
 										<p>
@@ -377,8 +392,8 @@ const icons: Record<string, string> = {
 											<li class="entry" data-beat={b(award.at)}>
 												<div class="clip">
 													<div class="row">
-														<span class="logo blank" aria-hidden="true">
-															<svg viewBox="0 0 24 24" set:html={icons.award} />
+														<span class="logo" style={logoStyle(award.logo)}>
+															<Image src={award.logo.src} alt="" width={160} />
 														</span>
 														<div>
 															<p class="title">{award.title}</p>
@@ -926,13 +941,19 @@ const icons: Record<string, string> = {
 		display: grid;
 		place-items: center;
 		flex: none;
-		width: 4.2em;
-		height: 4.2em;
+		width: 3.4em;
+		height: 3.4em;
+		padding: var(--pad);
+		overflow: hidden;
 		background: var(--bg);
-		color: #fff;
-		font-size: 0.8em;
-		font-weight: 700;
-		letter-spacing: 0.02em;
+		outline: 1px solid var(--li-line);
+		outline-offset: -1px;
+	}
+
+	.logo img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 
 	.logo.blank {
