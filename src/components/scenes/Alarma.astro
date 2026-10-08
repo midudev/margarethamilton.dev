@@ -1,0 +1,265 @@
+---
+import { Image } from 'astro:assets';
+import Dsky from '../Dsky.astro';
+import launch from '../../assets/photos/apollo11-launch.jpg';
+import eagle from '../../assets/photos/eagle-lunar-orbit.jpg';
+import missionControl from '../../assets/photos/mission-control.jpg';
+import aldrin from '../../assets/photos/aldrin-flag.jpg';
+import { getLang, translator } from '../../i18n';
+
+const t = translator(getLang(Astro));
+---
+
+<section class="scene alarma" data-scene="alarma" data-theme="space" data-year="1969" style="--len: 820">
+	<div class="stage">
+		<div class="layer shade" style="--b: 0.1">
+			<Image src={launch} alt={t({ es: 'El cohete Saturn V del Apollo 11 despegando entre llamas', en: 'The Apollo 11 Saturn V rocket lifting off in flames' })} widths={[720, 1280, 1920]} sizes="100vw" />
+		</div>
+		<div class="layer shade" style="--a: 0.1; --b: 0.21">
+			<Image
+				src={eagle}
+				alt={t({
+					es: 'El módulo lunar Eagle, dorado y con las patas desplegadas, en órbita sobre el negro del espacio',
+					en: 'The lunar module Eagle, gold with its legs deployed, in orbit against the black of space',
+				})}
+				widths={[720, 1280, 1920]}
+				sizes="100vw"
+			/>
+		</div>
+
+		<div class="layer dsky-layer" style="--a: 0.21; --b: 0.66" aria-hidden="true">
+			<div class="dsky-wrap">
+				<Dsky id="dsky-1202" prog="63" verb="16" noun="68" r1="+33500" r2="-00610" r3="+05740" />
+			</div>
+		</div>
+
+		<div class="layer shade" style="--a: 0.66; --b: 0.77">
+			<Image
+				src={missionControl}
+				alt={t({
+					es: 'La sala de control de misión en Houston, con consolas y pantallas, durante el Apollo 11',
+					en: 'Mission Control in Houston, with consoles and screens, during Apollo 11',
+				})}
+				widths={[720, 1280, 1920]}
+				sizes="100vw"
+			/>
+		</div>
+		<div class="layer moon shade" style="--a: 0.88">
+			<Image
+				src={aldrin}
+				alt={t({
+					es: 'Buzz Aldrin en la superficie lunar junto a la bandera, con el módulo lunar a la izquierda y huellas en el polvo',
+					en: 'Buzz Aldrin on the lunar surface next to the flag, with the lunar module on the left and footprints in the dust',
+				})}
+				widths={[720, 1280, 1920]}
+				sizes="100vw"
+			/>
+		</div>
+
+		<div class="text stack">
+			<p class="beat" data-beat="0 0.1">{t({ es: '16 de julio de 1969. Despega el Apollo 11.', en: 'July 16, 1969. Apollo 11 lifts off.' })}</p>
+			<p class="beat" data-beat="0.1 0.21">
+				{t({ es: 'Cuatro días después, el Eagle desciende hacia la Luna.', en: 'Four days later, Eagle descends toward the Moon.' })}
+			</p>
+
+			<div class="beat radio" data-beat="0.23 0.33" data-theme="alarm">
+				<span class="mono">102:38:26</span>
+				<q>Program alarm.</q>
+				<span class="who">Neil Armstrong</span>
+			</div>
+			<div class="beat radio" data-beat="0.33 0.43" data-theme="alarm">
+				<span class="mono">102:38:30</span>
+				<q>It’s a 1202.</q>
+				<span class="who">Neil Armstrong</span>
+			</div>
+			<p class="beat" data-beat="0.43 0.54" data-theme="space">
+				{
+					t({
+						es: 'El ordenador estaba recibiendo más trabajo del que podía hacer.',
+						en: 'The computer was being given more work than it could handle.',
+					})
+				}
+			</p>
+			<p class="beat" data-beat="0.54 0.66">
+				{
+					t({
+						es: 'No se colgó. El software de Margaret sabía qué era importante: soltó lo secundario y siguió guiando el descenso.',
+						en: 'It didn’t crash. Margaret’s software knew what mattered: it dropped the less important work and kept guiding the descent.',
+					})
+				}
+			</p>
+			<div class="beat radio" data-beat="0.66 0.77">
+				<span class="mono">102:38:53</span>
+				<q>We’re Go on that alarm.</q>
+				<span class="who">
+					{t({ es: 'Charlie Duke, desde Houston. Confiaron en el software.', en: 'Charlie Duke, from Houston. They trusted the software.' })}
+				</span>
+			</div>
+			<div class="beat radio" data-beat="0.77 0.88">
+				<span class="mono">102:45:40</span>
+				<q>Contact light.</q>
+				<span class="who">Buzz Aldrin</span>
+			</div>
+			<div class="beat radio landed" data-beat="0.9">
+				<span class="mono">102:45:58</span>
+				<q>The Eagle has landed.</q>
+				<span class="who">Neil Armstrong</span>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	import { $ } from '../../scripts/dom';
+	import { onProgress, segment } from '../../scripts/scroll';
+	import { createDsky } from '../../scripts/dsky';
+
+	const scene = $('[data-scene="alarma"]')!;
+	const dsky = createDsky($('#dsky-1202', scene)!);
+
+	const pad = (n: number, sign = '+') => sign + String(Math.max(0, Math.round(n))).padStart(5, '0');
+	const steps = [0.21, 0.23, 0.33, 0.54, 0.66, Infinity];
+	let current = -1;
+
+	onProgress(scene, (p) => {
+		const step = steps.findIndex((limit) => p < limit);
+
+		// Mientras desciende, los registros cuentan hacia abajo con el scroll
+		if (step <= 1 || step === 4) {
+			const t = segment(p, 0.15, 0.66);
+			dsky.show({ r1: pad(33500 - t * 26000), r2: pad(610 - t * 420, '-'), r3: pad(5740 - t * 4100) });
+		}
+
+		if (step === current) return;
+		const previous = current;
+		current = step;
+
+		if (step <= 1) {
+			dsky.show({ prog: '63', verb: '16', noun: '68', lamps: [] });
+			dsky.computing(true);
+		} else if (step === 2) {
+			dsky.show({ lamps: ['PROG'] });
+			dsky.computing(true);
+		} else if (step === 3) {
+			const alarm = () => dsky.show({ verb: '05', noun: '09', r1: '01202', r2: '', r3: '', lamps: ['PROG'] });
+			dsky.computing(false);
+			if (step > previous) dsky.press(['VERB', '0', '5', 'NOUN', '0', '9', 'ENTR']).then(() => current === step && alarm());
+			else alarm();
+		} else {
+			dsky.show({ prog: '63', verb: '16', noun: '68', lamps: [] });
+			dsky.computing(true);
+		}
+	});
+</script>
+
+<style>
+	.shade::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(0deg, rgb(0 0 0 / 0.78), rgb(0 0 0 / 0) 55%);
+	}
+
+	.moon > img {
+		transform: scale(calc(1.12 - 0.12 * var(--in)));
+	}
+
+	.dsky-wrap {
+		position: absolute;
+		right: clamp(1rem, 8vw, 9rem);
+		top: 50%;
+		width: min(36vw, 54vh, 460px);
+		translate: 0 -50%;
+	}
+
+	.text {
+		position: absolute;
+		left: var(--gutter);
+		right: var(--gutter);
+		bottom: clamp(3.5rem, 12vh, 8rem);
+		align-items: end;
+		pointer-events: none;
+	}
+
+	.text > p {
+		max-width: 24ch;
+		font-size: var(--t-lead);
+		line-height: 1.12;
+		letter-spacing: -0.015em;
+		text-wrap: pretty;
+	}
+
+	.radio {
+		display: grid;
+		gap: 0.5rem;
+		justify-items: start;
+	}
+
+	.radio .mono {
+		color: var(--fg-dim);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.radio q {
+		font-size: var(--t-display);
+		font-weight: 400;
+		line-height: 1;
+		letter-spacing: -0.025em;
+		quotes: '«' '»';
+	}
+
+	.radio q:lang(en) {
+		quotes: '“' '”';
+	}
+
+	.radio .who {
+		font-size: var(--t-body);
+	}
+
+	.landed q {
+		font-size: var(--t-giant);
+		font-weight: 300;
+		line-height: 0.9;
+		max-width: 10ch;
+	}
+
+	@media (min-width: 761px) {
+		.text {
+			right: auto;
+			width: min(52vw, 44rem);
+		}
+
+		.landed {
+			width: 90vw;
+		}
+	}
+
+	@media (max-width: 760px) {
+		.dsky-wrap {
+			top: 7vh;
+			right: 50%;
+			width: min(74vw, 44vh);
+			translate: 50% 0;
+		}
+
+		.text > p {
+			font-size: 1.35rem;
+		}
+
+		.radio q {
+			font-size: 2.6rem;
+		}
+
+		.landed q {
+			font-size: 3.6rem;
+		}
+	}
+
+	html:not(.js) .layer,
+	html:not(.js) .text,
+	html:not(.js) .dsky-wrap {
+		position: relative;
+		inset: auto;
+		translate: none;
+	}
+</style>
