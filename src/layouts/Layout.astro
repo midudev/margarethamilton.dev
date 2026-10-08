@@ -250,9 +250,8 @@ const jsonLd = {
 		font-size: var(--t-body);
 		font-weight: 400;
 		line-height: 1.45;
-		transition:
-			background-color 900ms ease,
-			color 900ms ease;
+		/* Only the background fades: color is inherited, so fading it would restyle the whole page on every frame */
+		transition: background-color 900ms ease;
 		-webkit-font-smoothing: antialiased;
 	}
 
@@ -303,6 +302,19 @@ const jsonLd = {
 		height: calc(var(--len, 300) * 1vh);
 	}
 
+	/* Scenes away from the viewport skip style, layout and paint, so theme changes and
+	   animations elsewhere don't cost anything there. Only with JS: without it scenes
+	   have no fixed height, and a skipped one would collapse */
+	.js .scene {
+		content-visibility: auto;
+	}
+
+	/* Once the scene engine runs, the scenes around the viewport render normally:
+	   inside content-visibility: auto, animations can't run on the compositor */
+	.scenes-ready .scene:not(.is-far) {
+		content-visibility: visible;
+	}
+
 	.stage {
 		position: sticky;
 		top: 0;
@@ -348,11 +360,18 @@ const jsonLd = {
 
 	/* Full-screen layers that appear at --a and disappear at --b */
 	.layer {
-		--in: clamp(0, calc((var(--p, 1) - var(--a, -1)) / 0.025), 1);
-		--out: clamp(0, calc((var(--p, 1) - var(--b, 2)) / 0.025), 1);
 		position: absolute;
 		inset: 0;
-		opacity: calc(var(--in) * (1 - var(--out)));
+		opacity: calc(
+			clamp(0, calc((var(--p, 1) - var(--a, -1)) / 0.025), 1) *
+				(1 - clamp(0, calc((var(--p, 1) - var(--b, 2)) / 0.025), 1))
+		);
+	}
+
+	/* Subtrees that don't follow --p: with a constant value here, scroll updates
+	   stop at this element instead of restyling everything inside on every frame */
+	.still {
+		--p: 0;
 	}
 
 	.layer > img {

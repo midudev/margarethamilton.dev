@@ -3,6 +3,7 @@
  * It computes each scene's scroll progress (0 → 1), exposes it as `--p`,
  * turns texts on ([data-beat="from to"]) at their moment and updates
  * the page's color theme and year according to the active scene.
+ * Scenes more than a screen away get `.is-far`, which skips their rendering.
  */
 
 import { $, $$ } from './dom';
@@ -20,6 +21,9 @@ interface Scene {
 	beats: Beat[];
 	listeners: Listener[];
 	p: number;
+	top: number;
+	height: number;
+	far?: boolean;
 }
 
 export const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -37,7 +41,18 @@ const scenes: Scene[] = $$('[data-scene]').map((el) => ({
 	}),
 	listeners: [],
 	p: -1,
+	top: 0,
+	height: 0,
 }));
+
+// Scene heights only depend on the viewport, so their positions are measured once per resize
+// instead of reading the layout on every frame
+function measure() {
+	for (const scene of scenes) {
+		scene.top = scene.el.offsetTop;
+		scene.height = scene.el.offsetHeight;
+	}
+}
 
 const root = document.documentElement;
 const yearEl = $('[data-year-display]');
@@ -63,15 +78,23 @@ function queue() {
 function frame() {
 	scheduled = false;
 	const vh = window.innerHeight;
+	const y = window.scrollY;
 	let active: Scene | undefined;
 
 	for (const scene of scenes) {
-		const r = scene.el.getBoundingClientRect();
-		if (r.top <= vh / 2 && r.bottom > vh / 2) active = scene;
-		if (r.bottom < -vh || r.top > vh * 2) continue;
+		const top = scene.top - y;
+		const bottom = top + scene.height;
+		if (top <= vh / 2 && bottom > vh / 2) active = scene;
 
-		const span = r.height - vh;
-		const p = span > 0 ? clamp(-r.top / span) : r.top <= 0 ? 1 : 0;
+		const far = bottom < -vh || top > vh * 2;
+		if (far !== scene.far) {
+			scene.far = far;
+			scene.el.classList.toggle('is-far', far);
+		}
+		if (far) continue;
+
+		const span = scene.height - vh;
+		const p = span > 0 ? clamp(-top / span) : top <= 0 ? 1 : 0;
 		if (p === scene.p) continue;
 		scene.p = p;
 
@@ -119,7 +142,10 @@ function setYear(year: number) {
 
 window.addEventListener('scroll', queue, { passive: true });
 window.addEventListener('resize', () => {
+	measure();
 	for (const scene of scenes) scene.p = -1;
 	queue();
 });
-queue();
+measure();
+frame();
+root.classList.add('scenes-ready');
