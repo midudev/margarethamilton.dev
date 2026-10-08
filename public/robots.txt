@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://margarethamilton.dev/sitemap.xml
+Host: https://margarethamilton.dev
