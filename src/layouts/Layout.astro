@@ -1,23 +1,427 @@
+---
+import { Font } from 'astro:assets';
+import { getLang, homePath, languages, translator, type Lang } from '../i18n';
+
+const lang = getLang(Astro);
+const t = translator(lang);
+
+const title = 'Margaret Hamilton (1936–2026)';
+const description = t({
+	es: 'Un homenaje a Margaret Hamilton, que dirigió el software del Apollo 11 y dio nombre a la ingeniería de software. Su historia, su código y la foto más famosa de la programación.',
+	en: 'A tribute to Margaret Hamilton, who led the Apollo 11 flight software and gave software engineering its name. Her story, her code and the most famous photo in programming.',
+});
+
+const site = Astro.site ?? new URL('https://margarethamilton.dev');
+const canonicalURL = new URL(homePath(lang), site);
+const ogImageURL = new URL('/og-image.jpg', site);
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'WebSite',
+			'@id': `${site}#website`,
+			url: canonicalURL.toString(),
+			name: 'margarethamilton.dev',
+			description,
+			inLanguage: lang,
+		},
+		{
+			'@type': 'Person',
+			'@id': `${site}#margaret-hamilton`,
+			name: 'Margaret Heafield Hamilton',
+			birthDate: '1936-08-17',
+			birthPlace: { '@type': 'Place', name: 'Paoli, Indiana' },
+			deathDate: '2026-09-30',
+			jobTitle: t({ es: 'Ingeniera de software', en: 'Software engineer' }),
+			alumniOf: { '@type': 'CollegeOrUniversity', name: 'Earlham College' },
+			award: [
+				'NASA Exceptional Space Act Award (2003)',
+				'Presidential Medal of Freedom (2016)',
+				'Computer History Museum Fellow Award (2017)',
+			],
+			sameAs: [
+				'https://es.wikipedia.org/wiki/Margaret_Hamilton_(cient%C3%ADfica)',
+				'https://en.wikipedia.org/wiki/Margaret_Hamilton_(software_engineer)',
+			],
+		},
+		{
+			'@type': 'SoftwareSourceCode',
+			name: 'Apollo Guidance Computer (Apollo 11)',
+			codeRepository: 'https://github.com/chrislgarry/Apollo-11',
+			programmingLanguage: 'AGC Assembly',
+		},
+	],
+};
+---
+
 <!doctype html>
-<html lang="en">
+<html lang={lang} data-theme="space">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script is:inline>
+			// Primera visita: muestra el idioma del navegador (el mismo que envía en Accept-Language).
+			// Después, manda la elección guardada con el selector.
+			(() => {
+				const root = document.documentElement;
+				root.classList.add('js');
+				const here = root.lang;
+				let saved = null;
+				try {
+					saved = localStorage.getItem('lang');
+				} catch {}
+				let target = saved;
+				if (!target) {
+					if (/bot|crawl|spider|slurp|lighthouse/i.test(navigator.userAgent)) return;
+					const prefs = navigator.languages?.length ? navigator.languages : [navigator.language || ''];
+					target = prefs.map((l) => l.slice(0, 2).toLowerCase()).find((l) => l === 'es' || l === 'en') ?? 'en';
+				}
+				if (target !== here && (target === 'es' || target === 'en')) {
+					location.replace(target === 'en' ? '/en/' : '/');
+				}
+			})();
+		</script>
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#000000" />
+		<link rel="canonical" href={canonicalURL} />
+		{
+			(Object.keys(languages) as Lang[]).map((l) => (
+				<link rel="alternate" hreflang={l} href={new URL(homePath(l), site)} />
+			))
+		}
+		<link rel="alternate" hreflang="x-default" href={new URL('/', site)} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<link rel="icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="sitemap" href="/sitemap.xml" />
+
+		<Font cssVariable="--font-jost" preload={[{ weight: '300 700', style: 'normal' }]} />
+		<Font cssVariable="--font-plex-mono" />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:site_name" content="margarethamilton.dev" />
+		<meta property="og:locale" content={t({ es: 'es_ES', en: 'en_US' })} />
+		<meta property="og:locale:alternate" content={t({ es: 'en_US', en: 'es_ES' })} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={ogImageURL} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta
+			property="og:image:alt"
+			content={t({
+				es: 'Margaret Hamilton en 1969, junto a los listados del software del Apollo',
+				en: 'Margaret Hamilton in 1969, next to the listings of the Apollo software',
+			})}
+		/>
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImageURL} />
+
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	</head>
 	<body>
+		<nav class="lang" aria-label={t({ es: 'Idioma', en: 'Language' })}>
+			{
+				(Object.keys(languages) as Lang[]).map((l) => (
+					<a
+						href={homePath(l)}
+						hreflang={l}
+						lang={l}
+						data-lang={l}
+						aria-current={l === lang ? 'page' : undefined}
+						title={languages[l]}
+					>
+						{l.toUpperCase()}
+					</a>
+				))
+			}
+		</nav>
 		<slot />
+		<p class="year" aria-hidden="true"><span data-year-display>1936</span></p>
 	</body>
 </html>
 
-<style>
-	html,
+<script>
+	import { $$ } from '../scripts/dom';
+	import '../scripts/scroll';
+
+	// Al cambiar de idioma, guarda la elección y conserva el punto de la historia
+	for (const link of $$<HTMLAnchorElement>('[data-lang]')) {
+		link.addEventListener('click', () => {
+			try {
+				localStorage.setItem('lang', link.dataset.lang!);
+				sessionStorage.setItem('scroll', String(window.scrollY));
+			} catch {}
+		});
+	}
+
+	try {
+		const scroll = sessionStorage.getItem('scroll');
+		if (scroll) {
+			sessionStorage.removeItem('scroll');
+			window.scrollTo({ top: Number(scroll), behavior: 'instant' });
+		}
+	} catch {}
+</script>
+
+<style is:global>
+	:root {
+		/* Materiales de la historia */
+		--vacio: #000000;
+		--luz: #ecece6;
+		--regolito: #8e8b84;
+		--papel: #e7eae2;
+		--barra-verde: #d4e4cf;
+		--tinta: #191c18;
+		--panel: #2c3033;
+		--el: #6cf59a;
+		--aviso: #f3b12f;
+		--cobre: #24120a;
+		--hilo: #d98a4e;
+
+		--font-sans: var(--font-jost);
+		--font-mono: var(--font-plex-mono);
+
+		--t-small: 0.875rem;
+		--t-body: clamp(1.0625rem, 0.95rem + 0.4vw, 1.3125rem);
+		--t-lead: clamp(1.5rem, 1.05rem + 1.9vw, 2.75rem);
+		--t-display: clamp(2.6rem, 1.2rem + 6vw, 7.5rem);
+		--t-giant: clamp(3.4rem, 0.6rem + 12vw, 13rem);
+
+		--gutter: clamp(1rem, 4vw, 4rem);
+		--ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+		--bg: var(--vacio);
+		--fg: var(--luz);
+		--fg-dim: var(--regolito);
+	}
+
+	html[data-theme='paper'] {
+		--bg: var(--papel);
+		--fg: var(--tinta);
+		--fg-dim: #5a6157;
+	}
+	html[data-theme='wall'] {
+		--bg: #efefeb;
+		--fg: var(--tinta);
+		--fg-dim: #6a6d68;
+	}
+	html[data-theme='panel'] {
+		--bg: var(--panel);
+		--fg: #e4e6e1;
+		--fg-dim: #9aa09b;
+	}
+	html[data-theme='alarm'] {
+		--bg: var(--aviso);
+		--fg: var(--vacio);
+		--fg-dim: #5c3f00;
+	}
+	html[data-theme='blueprint'] {
+		--bg: #1b3f8b;
+		--fg: #eef2fb;
+		--fg-dim: #a9badf;
+	}
+	html[data-theme='copper'] {
+		--bg: var(--cobre);
+		--fg: #f2dcc8;
+		--fg-dim: #b98a68;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	html {
+		-webkit-text-size-adjust: 100%;
+		text-rendering: optimizeLegibility;
+	}
+
 	body {
 		margin: 0;
+		background-color: var(--bg);
+		color: var(--fg);
+		font-family: var(--font-sans);
+		font-size: var(--t-body);
+		font-weight: 400;
+		line-height: 1.45;
+		transition:
+			background-color 900ms ease,
+			color 900ms ease;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	img,
+	svg {
+		display: block;
+		max-width: 100%;
+	}
+
+	h1,
+	h2,
+	h3,
+	p,
+	figure,
+	blockquote {
+		margin: 0;
+	}
+
+	a {
+		color: inherit;
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: 1px;
+	}
+
+	:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 4px;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	.mono {
+		font-family: var(--font-mono);
+		font-size: var(--t-small);
+		letter-spacing: 0.01em;
+	}
+
+	/* Escena: un contenedor alto (--len, en altos de pantalla) con un escenario fijo */
+	.scene {
+		position: relative;
+		height: calc(var(--len, 300) * 1vh);
+	}
+
+	.stage {
+		position: sticky;
+		top: 0;
+		height: 100vh;
+		height: 100dvh;
+		overflow: hidden;
+	}
+
+	/* Antes de que llegue el JS, cada escena está en su estado inicial */
+	.js .scene {
+		--p: 0;
+	}
+
+	/* Las estrellas no se muestran hasta estar repartidas por el cielo */
+	@media (prefers-reduced-motion: no-preference) {
+		.js [data-sky]:not(.is-placed) {
+			visibility: hidden;
+		}
+	}
+
+	/* Textos que se encienden en su momento, apilados en la misma celda */
+	.js .stack {
+		display: grid;
+	}
+	.js .stack > * {
+		grid-area: 1 / 1;
+	}
+
+	.js .beat {
+		opacity: 0;
+		visibility: hidden;
+		transition:
+			opacity 0.5s ease,
+			visibility 0s linear 0.5s;
+	}
+	.js .beat.is-on {
+		opacity: 1;
+		visibility: visible;
+		transition:
+			opacity 0.7s ease 0.1s,
+			visibility 0s;
+	}
+
+	/* Capas a pantalla completa que aparecen en --a y desaparecen en --b */
+	.layer {
+		--in: clamp(0, calc((var(--p, 1) - var(--a, -1)) / 0.025), 1);
+		--out: clamp(0, calc((var(--p, 1) - var(--b, 2)) / 0.025), 1);
+		position: absolute;
+		inset: 0;
+		opacity: calc(var(--in) * (1 - var(--out)));
+	}
+
+	.layer > img {
 		width: 100%;
 		height: 100%;
+		object-fit: cover;
+	}
+
+	/* Sin JavaScript, la historia se lee de arriba abajo */
+	html:not(.js) .scene {
+		height: auto;
+	}
+	html:not(.js) .stage {
+		position: relative;
+		height: auto;
+		min-height: 100vh;
+		padding-block: 10vh;
+	}
+
+	.lang {
+		position: fixed;
+		top: clamp(0.75rem, 3vh, 2rem);
+		right: var(--gutter);
+		z-index: 50;
+		display: flex;
+		gap: 0.25rem;
+		font-family: var(--font-mono);
+		font-size: 0.8125rem;
+	}
+
+	.lang a {
+		padding: 0.35rem 0.4rem;
+		color: var(--fg);
+		text-decoration: none;
+		opacity: 0.55;
+		text-shadow: 0 0 10px rgb(0 0 0 / 0.25);
+		transition:
+			opacity 0.2s,
+			color 900ms ease;
+	}
+
+	.lang a:hover,
+	.lang a[aria-current] {
+		opacity: 1;
+	}
+
+	.lang a[aria-current] {
+		text-decoration: underline;
+		text-underline-offset: 0.35em;
+	}
+
+	.year {
+		position: fixed;
+		left: var(--gutter);
+		bottom: clamp(0.75rem, 3vh, 2rem);
+		z-index: 50;
+		font-family: var(--font-mono);
+		font-size: 0.8125rem;
+		font-variant-numeric: tabular-nums;
+		color: var(--fg);
+		opacity: 0.75;
+		transition: color 900ms ease;
+		pointer-events: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		body,
+		.year {
+			transition: none;
+		}
 	}
 </style>
