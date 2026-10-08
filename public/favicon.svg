@@ -1,6 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Margaret Hamilton junto a los listados del software del Apollo, más altos que ella (MIT, 1969) -->
   <rect width="64" height="64" rx="14" fill="#000"/>
-  <circle cx="32" cy="36" r="13" fill="#6f9fd8"/>
-  <path d="M6 44h52v14a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6z" fill="#8e8b84"/>
-  <path d="M6 44h52" stroke="#000" stroke-width="2"/>
+  <g fill="#e7eae2">
+    <path d="M37 6.5h17.5l.5 7.5H36.5z"/>
+    <path d="M38 15h18v7.5H37.5z"/>
+    <path d="M36.5 23.5h18l.5 7H36z"/>
+    <path d="M37.5 31.5h18.5v7.5H37z"/>
+    <path d="M35.5 40h19.5l-.5 7.5H35z"/>
+    <path d="M36.5 48.5H56v9H37z"/>
+  </g>
+  <g fill="#d98a4e">
+    <path d="M20 21.5h7l4.2 21H15.8z"/>
+    <rect x="18.6" y="41" width="3.6" height="15.5" rx="1.6"/>
+    <rect x="24.2" y="41" width="3.6" height="15.5" rx="1.6"/>
+    <path d="M23.5 9.5c3.6 0 6 2.8 5.7 6.3-.2 2.4-1.7 4-3.4 4.5l.4 2.7h-6c-.4-5 .2-10.5 3.3-13.5z"/>
+  </g>
+  <path d="M25.5 25 35 16.5" fill="none" stroke="#d98a4e" stroke-width="4" stroke-linecap="round"/>
+  <path d="M23.5 9.5c-3.6 0-5.8 2.6-6.1 6.5-.3 4.3-.2 9.4.6 14.5h4c-.9-4.4-1.1-9-.2-13 .4-1.8 1.4-3 3-3.4 1.1-.3 2.6-.2 3.6.5-.3-3-2.2-5.1-4.9-5.1z" fill="#8f4f24"/>
 </svg>
