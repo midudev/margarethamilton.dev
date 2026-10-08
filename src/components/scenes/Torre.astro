@@ -1,0 +1,261 @@
+---
+import { Image } from 'astro:assets';
+import codeStack from '../../assets/photos/code-stack-1969.jpg';
+import lego from '../../assets/photos/lego-margaret-hamilton.jpg';
+import { getLang, translator } from '../../i18n';
+
+const t = translator(getLang(Astro));
+
+// Módulos reales de Luminary 099 y Comanche 055, de abajo arriba
+const binders = [
+	'EXECUTIVE',
+	'WAITLIST',
+	'INTERPRETER',
+	'FRESH_START_AND_RESTART',
+	'ALARM_AND_ABORT',
+	'SERVICER',
+	'KALMAN_FILTER',
+	'ORBITAL_INTEGRATION',
+	'P51-P53',
+	'THE_LUNAR_LANDING',
+	'LUNAR_LANDING_GUIDANCE_EQUATIONS',
+	'BURN_BABY_BURN',
+	'PINBALL_GAME_BUTTONS_AND_LIGHTS',
+	'DOWN_TELEMETRY_PROGRAM',
+	'RESTART_TABLES',
+	'ASCENT_GUIDANCE',
+	'P20-P25',
+];
+
+const rand = (i: number) => {
+	const x = Math.sin(i * 12.9898) * 43758.5453;
+	return x - Math.floor(x);
+};
+
+const slabs = binders.map((name, i) => ({
+	name,
+	h: 3.6 + rand(i) * 2.4,
+	shift: (rand(i + 40) - 0.5) * 8,
+	tilt: (rand(i + 80) - 0.5) * 2.4,
+	d: (i / binders.length) * 0.32,
+}));
+---
+
+<section class="scene torre" data-scene="torre" data-theme="wall" data-year="1969" style="--len: 620">
+	<div class="stage">
+		<div class="visual">
+			<div class="tower" aria-hidden="true">
+				{
+					slabs.map((s) => (
+						<div
+							class="slab"
+							style={`--h:${s.h.toFixed(2)};--shift:${s.shift.toFixed(2)}%;--tilt:${s.tilt.toFixed(2)}deg;--d:${s.d.toFixed(3)}`}
+						>
+							<span class="mono">{s.name}</span>
+						</div>
+					))
+				}
+			</div>
+
+			<figure class="photo">
+				<div class="zoom">
+					<Image
+						src={codeStack}
+						alt={t({
+							es: 'Margaret Hamilton en 1969, sonriente, junto a una pila de listados de código impresos casi tan alta como ella',
+							en: 'Margaret Hamilton in 1969, smiling, next to a stack of printed code listings almost as tall as she is',
+						})}
+						widths={[640, 960, 1280]}
+						sizes="(max-width: 760px) 90vw, 50vw"
+						loading="eager"
+					/>
+				</div>
+			</figure>
+		</div>
+
+		<div class="text stack">
+			<p class="beat" data-beat="0 0.34">{t({ es: 'Antes de GitHub, el código se imprimía.', en: 'Before GitHub, code was printed.' })}</p>
+			<p class="beat" data-beat="0.42 0.56">MIT, 1969.</p>
+			<p class="beat" data-beat="0.56 0.72">
+				{
+					t({
+						es: 'Son los listados del software de vuelo del módulo lunar y del de mando. Los escribieron los equipos que ella dirigía.',
+						en: 'These are the listings of the lunar module and command module flight software. Written by the teams she led.',
+					})
+				}
+			</p>
+			<p class="beat" data-beat="0.72 0.86">
+				{
+					t({
+						es: 'Impreso en papel continuo y apilado, casi tan alto como ella.',
+						en: 'Printed on fanfold paper and stacked, almost as tall as she was.',
+					})
+				}
+			</p>
+			<figure class="beat lego" data-beat="0.86">
+				<Image
+					src={lego}
+					alt={t({
+						es: 'Una minifigura de LEGO de Margaret Hamilton, en blanco y negro, junto a una torre de libros de LEGO y una pizarra, recreando la foto de 1969',
+						en: 'A black and white LEGO minifigure of Margaret Hamilton next to a tower of LEGO books and a blackboard, recreating the 1969 photo',
+					})}
+					widths={[480, 800]}
+					sizes="(max-width: 760px) 60vw, 34vw"
+				/>
+				<figcaption>
+					<p>{t({ es: 'En 2017, esta foto se convirtió en una figura de LEGO.', en: 'In 2017, this photo became a LEGO figure.' })}</p>
+					<span class="mono">
+						{
+							t({
+								es: 'Maqueta y foto: Maia Weinstock, autora del set Women of NASA',
+								en: 'Model and photo: Maia Weinstock, creator of the Women of NASA set',
+							})
+						}
+					</span>
+				</figcaption>
+			</figure>
+		</div>
+	</div>
+</section>
+
+<style>
+	.stage {
+		display: grid;
+		grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+		align-items: center;
+		gap: clamp(1.5rem, 5vw, 6rem);
+		padding: 6vh var(--gutter);
+	}
+
+	.visual {
+		position: relative;
+		height: 88vh;
+		height: 88dvh;
+		display: grid;
+		place-items: end center;
+	}
+
+	/* La torre se levanta listado a listado */
+	.tower {
+		display: flex;
+		flex-direction: column-reverse;
+		align-items: center;
+		width: min(70%, 320px);
+		height: 100%;
+		padding-bottom: 2%;
+		opacity: calc(1 - clamp(0, (var(--p, 1) - 0.4) / 0.03, 1));
+	}
+
+	.slab {
+		--t: clamp(0, calc((var(--p, 1) - var(--d)) / 0.06), 1);
+		position: relative;
+		flex: 0 0 auto;
+		width: 100%;
+		height: calc(var(--h) * 1%);
+		margin-top: -1px;
+		background:
+			repeating-linear-gradient(0deg, #fbfbf7 0 1.5px, #dcdcd4 1.5px 2.5px),
+			#f3f3ee;
+		border-block: 3px solid #2a2a27;
+		border-radius: 2px;
+		box-shadow: inset 6px 0 0 #3a3a36;
+		transform: translate(var(--shift), calc((1 - var(--t)) * -70vh)) rotate(var(--tilt));
+		opacity: var(--t);
+	}
+
+	.slab .mono {
+		position: absolute;
+		left: 14px;
+		top: 50%;
+		translate: 0 -50%;
+		padding: 0 4px;
+		background: #f7f7f2;
+		color: #3c3d39;
+		font-size: clamp(0.5rem, 0.4rem + 0.3vw, 0.6875rem);
+		white-space: nowrap;
+	}
+
+	.photo {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		overflow: hidden;
+		opacity: clamp(0, (var(--p, 1) - 0.4) / 0.02, 1);
+	}
+
+	/* Zoom con el scroll: primero la torre, después ella */
+	.zoom {
+		--z1: clamp(0, (var(--p, 1) - 0.56) / 0.1, 1);
+		--z2: clamp(0, (var(--p, 1) - 0.86) / 0.08, 1);
+		height: 100%;
+		transform-origin: 66% 38%;
+		transform: scale(calc(1 + 0.55 * var(--z1) - 0.55 * var(--z2)));
+		will-change: transform;
+	}
+
+	/* La foto se revela como en el cuarto oscuro */
+	.zoom img {
+		--dev: clamp(0, (var(--p, 1) - 0.4) / 0.08, 1);
+		height: 100%;
+		width: auto;
+		max-width: none;
+		filter: brightness(calc(1 + 2.2 * (1 - var(--dev)))) contrast(calc(0.35 + 0.65 * var(--dev)));
+	}
+
+	.text p {
+		max-width: 22ch;
+		font-size: var(--t-lead);
+		line-height: 1.12;
+		letter-spacing: -0.015em;
+		text-wrap: pretty;
+	}
+
+	.lego {
+		display: grid;
+		gap: 1.5rem;
+		justify-items: start;
+	}
+
+	.lego img {
+		width: min(100%, 26rem);
+		height: auto;
+		box-shadow: 0 20px 50px rgb(0 0 0 / 0.15);
+	}
+
+	.lego .mono {
+		display: block;
+		margin-top: 0.75rem;
+		color: var(--fg-dim);
+		font-size: 0.75rem;
+	}
+
+	@media (max-width: 760px) {
+		.stage {
+			grid-template-columns: 1fr;
+			grid-template-rows: 1fr auto;
+			padding-block: 4vh 9vh;
+			gap: 3vh;
+		}
+
+		.visual {
+			height: 62vh;
+			height: 62dvh;
+		}
+
+		.text p {
+			font-size: 1.35rem;
+			max-width: none;
+		}
+
+		.lego {
+			grid-template-columns: 38% 1fr;
+			align-items: end;
+			gap: 1rem;
+		}
+	}
+
+	html:not(.js) .tower {
+		display: none;
+	}
+</style>
