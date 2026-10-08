@@ -1,0 +1,209 @@
+---
+import { Image } from 'astro:assets';
+import Dsky from '../Dsky.astro';
+import simulator from '../../assets/photos/simulator.jpg';
+import { getLang, translator } from '../../i18n';
+
+const lang = getLang(Astro);
+const t = translator(lang);
+---
+
+<section class="scene lauren" data-scene="lauren" data-theme="panel" data-year="1968" style="--len: 520">
+	<div class="stage">
+		<figure class="photo">
+			<Image
+				src={simulator}
+				alt={t({
+					es: 'Margaret Hamilton, sonriente, tumbada en el asiento del simulador del módulo de mando del Apollo, con la mano en el panel de interruptores',
+					en: 'Margaret Hamilton, smiling, lying in the seat of the Apollo command module simulator, one hand on the switch panel',
+				})}
+				widths={[640, 1280]}
+				sizes="100vw"
+			/>
+		</figure>
+
+		<div class="dsky-wrap">
+			<Dsky id="dsky-lauren" prog="23" verb="51" noun="" r1="" r2="" r3="" />
+		</div>
+
+		<div class="text stack">
+			{
+				lang === 'es' ? (
+					<>
+						<p class="beat" data-beat="0 0.17">En el MIT, Margaret probaba el software en el simulador del módulo de mando.</p>
+						<p class="beat" data-beat="0.17 0.34">A veces se llevaba a su hija Lauren, aún pequeña, al laboratorio.</p>
+						<p class="beat" data-beat="0.34 0.5">
+							Jugando, Lauren lanzó el programa <span class="mono">P01</span>, el de antes del despegue, en mitad de un
+							vuelo simulado. Todo se colgó.
+						</p>
+						<p class="beat" data-beat="0.5 0.64">
+							Margaret quiso proteger el software contra ese error. Se lo denegaron: los astronautas estaban entrenados
+							para no cometerlo.
+						</p>
+						<p class="beat" data-beat="0.64 0.82">
+							Diciembre de 1968. Apollo 8, rumbo a la Luna. Jim Lovell lanza <span class="mono">P01</span> por error. Se
+							borran los datos de navegación.
+						</p>
+						<p class="beat" data-beat="0.82">
+							Desde tierra los recuperaron. Y su protección entró en el software.
+							<span class="coda">Hoy lo llamamos programación defensiva.</span>
+						</p>
+					</>
+				) : (
+					<>
+						<p class="beat" data-beat="0 0.17">At MIT, Margaret tested the software in the command module simulator.</p>
+						<p class="beat" data-beat="0.17 0.34">Sometimes she brought her young daughter, Lauren, to the lab.</p>
+						<p class="beat" data-beat="0.34 0.5">
+							Playing, Lauren launched <span class="mono">P01</span>, the prelaunch program, in the middle of a simulated
+							flight. Everything crashed.
+						</p>
+						<p class="beat" data-beat="0.5 0.64">
+							Margaret wanted to protect the software against that mistake. She was overruled: astronauts were trained
+							never to make it.
+						</p>
+						<p class="beat" data-beat="0.64 0.82">
+							December 1968. Apollo 8, on its way to the Moon. Jim Lovell launches <span class="mono">P01</span> by
+							mistake. The navigation data is wiped.
+						</p>
+						<p class="beat" data-beat="0.82">
+							It was recovered from the ground. And her protection went into the software.
+							<span class="coda">Today we call it defensive programming.</span>
+						</p>
+					</>
+				)
+			}
+		</div>
+	</div>
+</section>
+
+<script>
+	import { $ } from '../../scripts/dom';
+	import { onProgress } from '../../scripts/scroll';
+	import { createDsky, type DskyState } from '../../scripts/dsky';
+
+	const scene = $('[data-scene="lauren"]')!;
+	const dsky = createDsky($('#dsky-lauren', scene)!);
+
+	const navigating: DskyState = { prog: '23', verb: '51', noun: '', r1: '', r2: '', r3: '', lamps: [] };
+	const crashed: DskyState = { prog: '01', verb: '', noun: '', r1: '', r2: '', r3: '', lamps: ['RESTART'] };
+	const recovered: DskyState = { prog: '23', verb: '51', noun: '', r1: '', r2: '', r3: '', lamps: [] };
+
+	const steps = [0.34, 0.5, 0.64, 0.82, Infinity];
+	let current = -1;
+
+	onProgress(scene, (p) => {
+		const step = steps.findIndex((limit) => p < limit);
+		if (step === current) return;
+		const previous = current;
+		current = step;
+
+		if (step === 0 || step === 2) {
+			dsky.show(navigating);
+			dsky.computing(true);
+		} else if (step === 1 || step === 3) {
+			dsky.show(navigating);
+			dsky.computing(false);
+			const keys = ['VERB', '3', '7', 'ENTR', '0', '1', 'ENTR'];
+			if (step > previous) dsky.press(keys).then(() => current === step && dsky.show(crashed));
+			else dsky.show(crashed);
+		} else {
+			dsky.show(recovered);
+			dsky.computing(true);
+		}
+	});
+</script>
+
+<style>
+	.photo {
+		position: absolute;
+		inset: 0;
+		opacity: calc(1 - clamp(0, (var(--p, 1) - 0.3) / 0.06, 1));
+	}
+
+	.photo img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 40% 40%;
+		filter: grayscale(1) contrast(1.05);
+	}
+
+	.photo::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(90deg, rgb(0 0 0 / 0.72), rgb(0 0 0 / 0.1) 65%);
+	}
+
+	.dsky-wrap {
+		position: absolute;
+		right: clamp(1rem, 7vw, 8rem);
+		top: 50%;
+		width: min(36vw, 52vh, 460px);
+		translate: 0 -50%;
+		opacity: clamp(0, (var(--p, 1) - 0.3) / 0.06, 1);
+		transform: scale(calc(0.94 + 0.06 * clamp(0, (var(--p, 1) - 0.3) / 0.06, 1)));
+	}
+
+	.text {
+		position: absolute;
+		left: var(--gutter);
+		top: 50%;
+		width: min(44vw, 34rem);
+		translate: 0 -50%;
+		align-items: center;
+	}
+
+	.text p {
+		font-size: clamp(1.3rem, 0.95rem + 1.4vw, 2.2rem);
+		line-height: 1.18;
+		letter-spacing: -0.01em;
+		text-wrap: pretty;
+	}
+
+	.text .mono {
+		font-size: 0.85em;
+		color: var(--el);
+	}
+
+	.coda {
+		display: block;
+		margin-top: 1.2em;
+		font-style: italic;
+		font-weight: 300;
+	}
+
+	@media (max-width: 760px) {
+		.dsky-wrap {
+			top: 9vh;
+			right: 50%;
+			width: min(74vw, 46vh);
+			translate: 50% 0;
+		}
+
+		.text {
+			top: auto;
+			bottom: 9vh;
+			width: auto;
+			right: var(--gutter);
+			translate: none;
+		}
+
+		.text p {
+			font-size: 1.2rem;
+		}
+
+		.photo::after {
+			background: linear-gradient(0deg, rgb(0 0 0 / 0.8), rgb(0 0 0 / 0.05) 70%);
+		}
+	}
+
+	html:not(.js) .photo,
+	html:not(.js) .dsky-wrap,
+	html:not(.js) .text {
+		position: relative;
+		inset: auto;
+		translate: none;
+		width: auto;
+	}
+</style>
