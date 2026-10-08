@@ -1,0 +1,242 @@
+---
+import Stickers from '../Stickers.astro';
+import { getLang, translator } from '../../i18n';
+
+/**
+ * Los primeros años, perforados en tarjetas de 80 columnas como las que
+ * usaban en el MIT: cada carácter se codifica en código Hollerith.
+ */
+const t = translator(getLang(Astro));
+
+const milestones = t({
+	es: [
+		{ year: 1936, card: '1936 PAOLI, INDIANA', text: 'Nace en Paoli, Indiana.' },
+		{ year: 1958, card: '1958 EARLHAM COLLEGE, MATEMATICAS', text: 'Se licencia en Matemáticas.' },
+		{
+			year: 1959,
+			card: '1959 MIT, METEOROLOGIA, EDWARD LORENZ',
+			text: 'Entra en el MIT para programar predicciones del tiempo con Edward Lorenz, el del efecto mariposa.',
+		},
+		{
+			year: 1961,
+			card: '1961 MIT LINCOLN LAB, SAGE',
+			text: 'En SAGE, el sistema de defensa aérea, le dan un programa que nadie lograba hacer funcionar, comentado en griego y latín. Ella lo consigue.',
+		},
+		{
+			year: 1965,
+			card: '1965 MIT INSTRUMENTATION LAB, APOLLO',
+			text: 'Primera programadora contratada para el proyecto Apollo.',
+		},
+		{ year: 1968, card: '1968 APOLLO, MODULO DE MANDO', text: 'Dirige el equipo que programa el módulo de mando.' },
+	],
+	en: [
+		{ year: 1936, card: '1936 PAOLI, INDIANA', text: 'Born in Paoli, Indiana.' },
+		{ year: 1958, card: '1958 EARLHAM COLLEGE, MATHEMATICS', text: 'Graduates in mathematics.' },
+		{
+			year: 1959,
+			card: '1959 MIT, METEOROLOGY, EDWARD LORENZ',
+			text: 'Joins MIT to program weather prediction software for Edward Lorenz, of butterfly effect fame.',
+		},
+		{
+			year: 1961,
+			card: '1961 MIT LINCOLN LAB, SAGE',
+			text: 'At SAGE, the air defense system, she gets the program nobody could make work, commented in Greek and Latin. She makes it work.',
+		},
+		{
+			year: 1965,
+			card: '1965 MIT INSTRUMENTATION LAB, APOLLO',
+			text: 'The first programmer hired for the Apollo project.',
+		},
+		{ year: 1968, card: '1968 APOLLO, COMMAND MODULE', text: 'Leads the team programming the command module.' },
+	],
+});
+
+const W = 738;
+const H = 325;
+const ROWS = ['12', '11', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+const colX = (c: number) => 25 + c * 8.7;
+const rowY = (row: string) => 25 + ROWS.indexOf(row) * 25;
+
+function hollerith(ch: string): string[] {
+	if (/[0-9]/.test(ch)) return [ch];
+	const zones: [string, string, number][] = [
+		['ABCDEFGHI', '12', 1],
+		['JKLMNOPQR', '11', 1],
+		['STUVWXYZ', '0', 2],
+	];
+	for (const [letters, zone, offset] of zones) {
+		const i = letters.indexOf(ch);
+		if (i >= 0) return [zone, String(i + offset)];
+	}
+	const symbols: Record<string, string[]> = { '.': ['12', '3', '8'], ',': ['0', '3', '8'], '-': ['11'], '/': ['0', '1'] };
+	return symbols[ch] ?? [];
+}
+
+const cards = milestones.map((m) => ({
+	...m,
+	holes: m.card.split('').flatMap((ch, col) =>
+		hollerith(ch).map((row) => ({ x: colX(col) - 2.75, y: rowY(row) - 6.25, c: col / m.card.length })),
+	),
+	printed: m.card.split('').map((ch, col) => ({ ch, x: colX(col), c: col / m.card.length })),
+}));
+
+const N = cards.length;
+const SCALE = 6.4;
+const OFFSET = 0.25;
+// Cada recuerdo cae justo cuando aparece su hito
+const stickerAt = milestones.map((_, i) => Math.max(0.015, (i + 0.2 - OFFSET) / SCALE + 0.005));
+
+const beat = (i: number) =>
+	i === N - 1
+		? ((i + 0.2 - OFFSET) / SCALE).toFixed(3)
+		: `${((i + 0.2 - OFFSET) / SCALE).toFixed(3)} ${((i + 1.2 - OFFSET) / SCALE).toFixed(3)}`;
+---
+
+<section class="scene hitos" data-scene="hitos" data-theme="paper" data-year="1936" style={`--len: ${N * 95}`}>
+	<div class="stage">
+		<div class="deck" style={`--scale:${SCALE};--offset:${OFFSET}`} aria-hidden="true">
+			{
+				cards.map((card, i) => (
+					<svg class="card" viewBox={`0 0 ${W} ${H}`} style={`--i:${i}`}>
+						<defs>
+							<pattern id={`digits-${i}`} width="8.7" height={H} patternUnits="userSpaceOnUse" x={colX(0) - 4.35}>
+								{ROWS.slice(2).map((row) => (
+									<text x="4.35" y={rowY(row) + 2.6}>
+										{row}
+									</text>
+								))}
+							</pattern>
+						</defs>
+						<path class="stock" d={`M16 0H${W}V${H}H0V16Z`} />
+						<rect x={colX(0) - 4.35} y="60" width={80 * 8.7} height={H - 50} fill={`url(#digits-${i})`} />
+						{card.printed.map(({ ch, x, c }) => (
+							<text class="printed" x={x} y="11" style={`--c:${c.toFixed(3)}`}>
+								{ch}
+							</text>
+						))}
+						{card.holes.map(({ x, y, c }) => (
+							<rect class="hole" x={x} y={y} width="5.5" height="12.5" style={`--c:${c.toFixed(3)}`} />
+						))}
+					</svg>
+				))
+			}
+		</div>
+
+		<Stickers at={stickerAt} />
+
+		<ol class="captions stack">
+			{
+				milestones.map((m, i) => (
+					<li class="beat" data-beat={beat(i)} data-year={m.year}>
+						<span class="mono">{m.year}</span>
+						<p>{m.text}</p>
+					</li>
+				))
+			}
+		</ol>
+	</div>
+</section>
+
+<style>
+	.stage {
+		/* Las tarjetas dejan sitio a los lados para el collage de pegatinas */
+		--deck-w: min(100%, 56vw, 820px);
+		display: grid;
+		grid-template-rows: 1fr auto;
+		align-items: center;
+		justify-items: center;
+		padding: 12vh var(--gutter) 14vh;
+		gap: 5vh;
+	}
+
+	.deck {
+		position: relative;
+		width: var(--deck-w);
+		aspect-ratio: 738 / 325;
+		--q: calc(var(--p, 1) * var(--scale) + var(--offset));
+	}
+
+	.card {
+		--t: clamp(0, calc(var(--q) - var(--i)), 1);
+		--enter: clamp(0, calc(var(--t) / 0.25), 1);
+		--punch: clamp(0, calc((var(--t) - 0.22) / 0.6), 1);
+		--age: clamp(0, calc(var(--q) - var(--i) - 1), 6);
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+		transform: translate(
+				calc((1 - var(--enter)) * 110vw + var(--age) * -0.6%),
+				calc(var(--age) * -2.4%)
+			)
+			rotate(calc((1 - var(--enter)) * 8deg + var(--age) * -0.5deg));
+		filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.12)) drop-shadow(0 8px 18px rgb(0 0 0 / 0.08));
+		will-change: transform;
+	}
+
+	.stock {
+		fill: #efe5ca;
+	}
+
+	.card text {
+		font-family: var(--font-mono);
+		font-size: 7px;
+		text-anchor: middle;
+		fill: #9a8a6c;
+	}
+
+	.card .printed {
+		font-size: 9px;
+		font-weight: 500;
+		fill: #2b2a26;
+		opacity: clamp(0, calc((var(--punch) - var(--c)) * 30), 1);
+	}
+
+	.hole {
+		fill: #2a2722;
+		opacity: clamp(0, calc((var(--punch) - var(--c)) * 30), 1);
+	}
+
+	.captions {
+		width: var(--deck-w);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		align-self: start;
+	}
+
+	.captions li {
+		display: grid;
+		gap: 0.6rem;
+		align-content: start;
+	}
+
+	.captions .mono {
+		color: var(--fg-dim);
+	}
+
+	.captions p {
+		max-width: 34ch;
+		font-size: clamp(1.3rem, 0.95rem + 1.5vw, 2.25rem);
+		line-height: 1.15;
+		letter-spacing: -0.01em;
+		text-wrap: pretty;
+	}
+
+	/* En móvil: pegatinas arriba, tarjetas, más pegatinas y el texto abajo */
+	@media (max-width: 760px) {
+		.stage {
+			--deck-w: 100%;
+			align-items: start;
+			padding-top: 27vh;
+		}
+	}
+
+	html:not(.js) .deck {
+		display: none;
+	}
+	html:not(.js) .captions li + li {
+		margin-top: 3rem;
+	}
+</style>
