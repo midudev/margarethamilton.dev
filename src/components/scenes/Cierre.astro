@@ -1,0 +1,234 @@
+---
+import { Image } from 'astro:assets';
+import StarText from '../StarText.astro';
+import Starfield from '../Starfield.astro';
+import earth from '../../assets/photos/earth-over-moon.jpg';
+import { getLang, translator } from '../../i18n';
+
+const lang = getLang(Astro);
+const t = translator(lang);
+const thanks = t({ es: 'Gracias, Margaret.', en: 'Thank you, Margaret.' });
+
+const LEGO_PHOTO = 'https://www.flickr.com/photos/pixbymaia/27769398384/';
+const CC_BY_NC_ND = 'https://creativecommons.org/licenses/by-nc-nd/2.0/';
+const PORTRAIT_1995 = 'https://commons.wikimedia.org/wiki/File:Margaret_Hamilton_1995.jpg';
+const CC_BY_SA = 'https://creativecommons.org/licenses/by-sa/3.0/';
+const REPO = 'https://github.com/chrislgarry/Apollo-11';
+const MIT_NEWS = 'https://news.mit.edu/2026/margaret-hamilton-computing-pioneer-dies-1007';
+const ALSJ = 'https://apollojournals.org/alsj/a11/a11.landing.html';
+---
+
+<section class="scene cierre" data-scene="cierre" data-theme="space" data-year="2026" style="--len: 320">
+	<div class="stage">
+		<div class="layer earth" style="--a: 0.02">
+			<Image
+				src={earth}
+				alt={t({
+					es: 'La Tierra asomando sobre el horizonte de la Luna, fotografiada desde el Apollo 11',
+					en: 'Earth rising over the lunar horizon, photographed from Apollo 11',
+				})}
+				widths={[720, 1280, 1920]}
+				sizes="100vw"
+			/>
+		</div>
+
+		<Starfield />
+
+		<div class="sky" data-sky>
+			<h2 class="thanks">
+				<StarText text={thanks} start={0.12} spread={0.3} dur={0.14} /><span class="sr-only">{thanks}</span>
+			</h2>
+		</div>
+
+		<div class="end beat" data-beat="0.62">
+			<p class="mono">
+				{t({ es: '17 de agosto de 1936 – 30 de septiembre de 2026', en: 'August 17, 1936 – September 30, 2026' })}
+			</p>
+			<button
+				class="button"
+				type="button"
+				data-share
+				data-share-text={t({ es: 'Un homenaje a Margaret Hamilton', en: 'A tribute to Margaret Hamilton' })}
+				data-copied={t({ es: 'Enlace copiado', en: 'Link copied' })}
+			>
+				{t({ es: 'Compartir este homenaje', en: 'Share this tribute' })}
+			</button>
+		</div>
+	</div>
+</section>
+
+<footer class="credits">
+	{
+		lang === 'es' ? (
+			<dl>
+				<div>
+					<dt>Fotos</dt>
+					<dd>
+						NASA (Apollo 11, simulador del módulo de mando, retrato de 1989). Draper Laboratory, 1969, restaurada por
+						Adam Cuerden. Casa Blanca, 2016. Paoli en 1940: Historic American Buildings Survey. Memoria de cuerda: Wikimedia
+						Commons. Insignias del Apollo: NASA. Todas de dominio público. Consola SAGE: Tomwsulcer (CC0). Figura de LEGO:{' '}
+						<a href={LEGO_PHOTO}>Maia Weinstock</a>, <a href={CC_BY_NC_ND}>CC BY-NC-ND 2.0</a>. Retrato de 1995:{' '}
+						<a href={PORTRAIT_1995}>Daphne Weld Nichols</a>, <a href={CC_BY_SA}>CC BY-SA 3.0</a>, pasado a blanco y negro.
+					</dd>
+				</div>
+				<div>
+					<dt>Código</dt>
+					<dd>
+						Luminary 099, transcrito por el proyecto Virtual AGC a partir de los listados del MIT Museum, en{' '}
+						<a href={REPO}>github.com/chrislgarry/Apollo-11</a>.
+					</dd>
+				</div>
+				<div>
+					<dt>Fuentes</dt>
+					<dd>
+						<a href={MIT_NEWS}>MIT News</a> y el <a href={ALSJ}>Apollo Lunar Surface Journal</a>.
+					</dd>
+				</div>
+			</dl>
+		) : (
+			<dl>
+				<div>
+					<dt>Photos</dt>
+					<dd>
+						NASA (Apollo 11, command module simulator, 1989 portrait). Draper Laboratory, 1969, restored by Adam
+						Cuerden. The White House, 2016. Paoli in 1940: Historic American Buildings Survey. Rope memory: Wikimedia
+						Commons. Apollo insignia: NASA. All public domain. SAGE console: Tomwsulcer (CC0). LEGO figure:{' '}
+						<a href={LEGO_PHOTO}>Maia Weinstock</a>, <a href={CC_BY_NC_ND}>CC BY-NC-ND 2.0</a>. 1995 portrait:{' '}
+						<a href={PORTRAIT_1995}>Daphne Weld Nichols</a>, <a href={CC_BY_SA}>CC BY-SA 3.0</a>, converted to black and white.
+					</dd>
+				</div>
+				<div>
+					<dt>Code</dt>
+					<dd>
+						Luminary 099, transcribed by the Virtual AGC project from the MIT Museum listings, at{' '}
+						<a href={REPO}>github.com/chrislgarry/Apollo-11</a>.
+					</dd>
+				</div>
+				<div>
+					<dt>Sources</dt>
+					<dd>
+						<a href={MIT_NEWS}>MIT News</a> and the <a href={ALSJ}>Apollo Lunar Surface Journal</a>.
+					</dd>
+				</div>
+			</dl>
+		)
+	}
+</footer>
+
+<script>
+	import { $ } from '../../scripts/dom';
+	import { starfield } from '../../scripts/stars';
+
+	const scene = $('[data-scene="cierre"]')!;
+	starfield($('.stage', scene)!, { seed: 2026, photo: true });
+
+	const button = $<HTMLButtonElement>('[data-share]', scene)!;
+	const label = button.textContent;
+	button.addEventListener('click', async () => {
+		const data = { title: document.title, text: button.dataset.shareText, url: location.href };
+		try {
+			if (navigator.share) {
+				await navigator.share(data);
+				return;
+			}
+			await navigator.clipboard.writeText(data.url);
+			button.textContent = button.dataset.copied!;
+			setTimeout(() => (button.textContent = label), 2400);
+		} catch {
+			// Compartir cancelado
+		}
+	});
+</script>
+
+<style>
+	.earth > img {
+		transform: scale(calc(1.15 - 0.15 * clamp(0, var(--p, 1) / 0.6, 1)));
+		object-position: 50% 40%;
+	}
+
+	.earth::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: rgb(0 0 0 / 0.35);
+	}
+
+	.sky {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		padding-inline: var(--gutter);
+	}
+
+	.thanks {
+		font-size: var(--t-display);
+		font-weight: 300;
+		line-height: 1;
+		letter-spacing: -0.02em;
+		text-align: center;
+	}
+
+	.end {
+		position: absolute;
+		left: var(--gutter);
+		right: var(--gutter);
+		bottom: clamp(3.5rem, 12vh, 8rem);
+		display: grid;
+		justify-items: center;
+		gap: 1.5rem;
+		text-align: center;
+	}
+
+	.end .mono {
+		color: var(--fg-dim);
+	}
+
+	.button {
+		padding: 0.9em 1.5em;
+		background: var(--fg);
+		color: var(--bg);
+		border: 0;
+		border-radius: 999px;
+		font: inherit;
+		font-weight: 500;
+		cursor: pointer;
+		transition: transform 0.2s var(--ease-out);
+	}
+
+	.button:hover {
+		transform: translateY(-2px);
+	}
+
+	.credits {
+		padding: 12vh var(--gutter) 14vh;
+		background: var(--vacio);
+		color: var(--regolito);
+		font-size: var(--t-small);
+	}
+
+	.credits dl {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+		gap: 2rem;
+		max-width: 72rem;
+		margin: 0;
+	}
+
+	.credits dt {
+		margin-bottom: 0.4rem;
+		color: var(--luz);
+	}
+
+	.credits dd {
+		margin: 0;
+		max-width: 46ch;
+	}
+
+	html:not(.js) .sky,
+	html:not(.js) .end,
+	html:not(.js) .layer {
+		position: relative;
+		inset: auto;
+	}
+</style>
