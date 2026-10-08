@@ -58,6 +58,14 @@ const lamps = [
 	['', 'VEL'],
 ].flat();
 
+// Faceplate screws, each one tightened to a different angle
+const screws = [
+	{ x: '2.3cqw', y: '2.3cqw', r: 18 },
+	{ x: 'calc(100% - 2.3cqw)', y: '2.3cqw', r: 61 },
+	{ x: '2.3cqw', y: 'calc(100% - 2.3cqw)', r: 77 },
+	{ x: 'calc(100% - 2.3cqw)', y: 'calc(100% - 2.3cqw)', r: 34 },
+];
+
 const keys = [
 	{ k: 'VERB', area: '2 / 1 / 4 / 2' },
 	{ k: 'NOUN', area: '4 / 1 / 6 / 2' },
@@ -81,150 +89,265 @@ const keys = [
 ];
 ---
 
-<div class:list={['dsky', className]} id={id} aria-hidden="true">
-	<div class="face">
-		<div class="dsky-top">
-			<div class="lamps">
-				{lamps.map((lamp) => <span class="lamp" data-lamp={lamp || undefined}>{lamp}</span>)}
+<div class:list={['dsky', 'still', className]} id={id} aria-hidden="true">
+	<div class="case">
+		<div class="face">
+			{screws.map(({ x, y, r }) => <i class="screw" style={`left:${x};top:${y};--r:${r}deg`} />)}
+
+			<div class="dsky-top">
+				<div class="window">
+					<div class="lamps">
+						{lamps.map((lamp) => <span class="lamp" data-lamp={lamp || undefined}>{lamp}</span>)}
+					</div>
+				</div>
+
+				<div class="window">
+					<div class="el">
+						<div class="el-row">
+							<span class="el-label acty" data-acty>COMP<br />ACTY</span>
+							<div class="el-field">
+								<span class="el-label">PROG</span>
+								<span class="digits" data-field="prog">
+									{digits(prog, 2).map((d) => <span class="d" data-d={d} set:html={digitSvg} />)}
+								</span>
+							</div>
+						</div>
+						<div class="el-row">
+							<div class="el-field">
+								<span class="el-label">VERB</span>
+								<span class="digits" data-field="verb">
+									{digits(verb, 2).map((d) => <span class="d" data-d={d} set:html={digitSvg} />)}
+								</span>
+							</div>
+							<div class="el-field">
+								<span class="el-label">NOUN</span>
+								<span class="digits" data-field="noun">
+									{digits(noun, 2).map((d) => <span class="d" data-d={d} set:html={digitSvg} />)}
+								</span>
+							</div>
+						</div>
+						{
+							Object.entries(registers).map(([name, reg]) => (
+								<div class="el-register">
+									<span class="digits" data-field={name}>
+										<span class="d sign" data-s={reg.sign} set:html={signSvg} />
+										{reg.digits.map((d) => (
+											<span class="d" data-d={d} set:html={digitSvg} />
+										))}
+									</span>
+								</div>
+							))
+						}
+					</div>
+				</div>
 			</div>
 
-			<div class="el">
-				<div class="el-row">
-					<span class="el-label acty" data-acty>COMP<br />ACTY</span>
-					<div class="el-field">
-						<span class="el-label">PROG</span>
-						<span class="digits" data-field="prog">
-							{digits(prog, 2).map((d) => <span class="d" data-d={d} set:html={digitSvg} />)}
-						</span>
-					</div>
-				</div>
-				<div class="el-row">
-					<div class="el-field">
-						<span class="el-label">VERB</span>
-						<span class="digits" data-field="verb">
-							{digits(verb, 2).map((d) => <span class="d" data-d={d} set:html={digitSvg} />)}
-						</span>
-					</div>
-					<div class="el-field">
-						<span class="el-label">NOUN</span>
-						<span class="digits" data-field="noun">
-							{digits(noun, 2).map((d) => <span class="d" data-d={d} set:html={digitSvg} />)}
-						</span>
-					</div>
-				</div>
+			<div class="keys">
 				{
-					Object.entries(registers).map(([name, reg]) => (
-						<div class="el-register">
-							<span class="digits" data-field={name}>
-								<span class="d sign" data-s={reg.sign} set:html={signSvg} />
-								{reg.digits.map((d) => (
-									<span class="d" data-d={d} set:html={digitSvg} />
-								))}
-							</span>
-						</div>
+					keys.map(({ k, area }) => (
+						<span class="key" data-key={k} style={`grid-area: ${area}`}>
+							{k}
+						</span>
 					))
 				}
 			</div>
-		</div>
-
-		<div class="keys">
-			{
-				keys.map(({ k, area }) => (
-					<span class="key" data-key={k} style={`grid-area: ${area}`}>
-						{k}
-					</span>
-				))
-			}
 		</div>
 	</div>
 </div>
 
 <style>
+	/* Everything is drawn with CSS: light comes from above and slightly to the left */
 	.dsky {
-		--face: #a9adab;
-		--face-dark: #6d7271;
-		--glass: #0d1310;
+		--metal: #aeb2af;
+		--glass: #080c0a;
+		--el-on: #a3ffc4;
 		container-type: inline-size;
 		width: 100%;
 	}
 
-	.face {
-		padding: 4cqw;
-		background: linear-gradient(180deg, #b7bbb9, var(--face));
-		border-radius: 1.6cqw;
+	/* Aluminium housing: only its rounded rim shows around the faceplate */
+	.case {
+		padding: 1cqw;
+		border-radius: 2.6cqw;
+		background: linear-gradient(150deg, #e0e3e0 0%, #a6aaa7 38%, #7d817e 70%, #5d615e 100%);
 		box-shadow:
-			inset 0 0 0 0.4cqw rgb(255 255 255 / 0.25),
-			0 3cqw 8cqw rgb(0 0 0 / 0.45);
+			0 0.25cqw 0.3cqw rgb(0 0 0 / 0.4),
+			0 2cqw 3cqw -0.5cqw rgb(0 0 0 / 0.45),
+			0 7cqw 12cqw -2cqw rgb(0 0 0 / 0.5);
+	}
+
+	/* Painted faceplate, with a fine grain and the light falling off towards the bottom */
+	.face {
+		position: relative;
+		padding: 4.4cqw 4.2cqw 4.6cqw;
+		border-radius: 1.8cqw;
+		background:
+			radial-gradient(130% 90% at 22% -10%, rgb(255 255 255 / 0.26), transparent 62%),
+			radial-gradient(rgb(0 0 0 / 0.07) 0.5px, transparent 0.7px) 0 0 / 3px 3px,
+			radial-gradient(rgb(255 255 255 / 0.08) 0.5px, transparent 0.7px) 1px 2px / 5px 4px,
+			linear-gradient(180deg, #bcc0bd, #a4a8a5 55%, #979b98);
+		box-shadow:
+			inset 0 0.22cqw 0 rgb(255 255 255 / 0.55),
+			inset 0.18cqw 0 0 rgb(255 255 255 / 0.18),
+			inset -0.18cqw 0 0 rgb(0 0 0 / 0.1),
+			inset 0 -0.25cqw 0 rgb(0 0 0 / 0.22),
+			inset 0 0 3cqw rgb(0 0 0 / 0.08);
 		font-family: var(--font-sans);
 		font-weight: 500;
 		user-select: none;
+	}
+
+	/* Phillips screws, slightly sunk into the paint */
+	.screw {
+		position: absolute;
+		width: 2.3cqw;
+		aspect-ratio: 1;
+		translate: -50% -50%;
+		rotate: var(--r);
+		border-radius: 50%;
+		background:
+			radial-gradient(circle at 36% 30%, rgb(255 255 255 / 0.85), transparent 38%),
+			radial-gradient(circle, #cfd2cf 0 35%, #959996 68%, #626563);
+		box-shadow:
+			0 0 0 0.18cqw rgb(0 0 0 / 0.12),
+			0 0.12cqw 0.18cqw rgb(0 0 0 / 0.55),
+			inset 0 -0.12cqw 0.2cqw rgb(0 0 0 / 0.35);
+	}
+
+	.screw::before,
+	.screw::after {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		width: 64%;
+		height: 15%;
+		translate: -50% -50%;
+		border-radius: 0.1cqw;
+		background: linear-gradient(180deg, #2f3231, #5d605e);
+		box-shadow: 0 0.06cqw 0 rgb(255 255 255 / 0.55);
+	}
+
+	.screw::after {
+		rotate: 90deg;
 	}
 
 	.dsky-top {
 		display: grid;
 		grid-template-columns: 1fr 1.15fr;
 		gap: 3cqw;
-		padding: 2.4cqw;
-		background: var(--face-dark);
-		border-radius: 0.8cqw;
 	}
 
+	/* Windows cut into the faceplate: shadow under the top lip, light on the bottom one */
+	.window {
+		position: relative;
+		display: grid;
+		padding: 0.8cqw;
+		border-radius: 1.1cqw;
+		background: linear-gradient(180deg, #171a19, #262a28);
+		box-shadow:
+			0 -0.15cqw 0 rgb(0 0 0 / 0.22),
+			0 0.18cqw 0 rgb(255 255 255 / 0.6),
+			inset 0 0.5cqw 0.7cqw rgb(0 0 0 / 0.75),
+			inset 0 -0.12cqw 0 rgb(255 255 255 / 0.1);
+	}
+
+	/* The glass in front: a diagonal reflection and a brighter top edge */
+	.window::after {
+		content: '';
+		position: absolute;
+		inset: 0.8cqw;
+		border-radius: 0.5cqw;
+		background:
+			linear-gradient(115deg, rgb(255 255 255 / 0.09) 0 24%, rgb(255 255 255 / 0.025) 24.3% 41%, transparent 41.3%),
+			linear-gradient(180deg, rgb(255 255 255 / 0.07), transparent 22%);
+		box-shadow: inset 0 0.08cqw 0 rgb(255 255 255 / 0.12);
+		pointer-events: none;
+	}
+
+	/* Annunciator lamps: frosted lenses in a black frame */
 	.lamps {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 1.2cqw;
-		align-content: start;
+		grid-auto-rows: 1fr;
+		gap: 0.55cqw;
+		padding: 0.55cqw;
+		border-radius: 0.5cqw;
+		background: #0e100f;
+		isolation: isolate;
 	}
 
 	.lamp {
+		position: relative;
+		z-index: 0;
 		display: grid;
 		place-items: center;
-		min-height: 7.6cqw;
+		min-height: 7cqw;
 		padding: 0.6cqw;
-		background: #c9ccc6;
-		color: #3a3d3b;
-		border-radius: 0.4cqw;
-		font-size: 2.15cqw;
+		border-radius: 0.25cqw;
+		background: radial-gradient(130% 110% at 50% 35%, #c5c7c1, #a3a59f 70%, #8d8f8a);
+		color: rgb(38 40 38 / 0.62);
+		font-size: 2.05cqw;
 		line-height: 1.05;
 		letter-spacing: 0.04em;
 		text-align: center;
-		box-shadow: inset 0 -0.4cqw 0 rgb(0 0 0 / 0.12);
+		text-shadow: 0 0.08cqw 0 rgb(255 255 255 / 0.3);
+		box-shadow:
+			inset 0 0.35cqw 0.45cqw rgb(0 0 0 / 0.45),
+			inset 0 -0.08cqw 0 rgb(255 255 255 / 0.3);
 		transition:
-			background-color 0.15s,
 			color 0.15s,
 			box-shadow 0.15s;
 	}
 
-	.lamp:not([data-lamp]) {
-		visibility: hidden;
+	/* The bulb behind the lens: a hot centre fading to the edges */
+	.lamp::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		border-radius: inherit;
+		background: radial-gradient(85% 75% at 50% 50%, #fff7d6 0%, #ffd866 42%, #f0a523 100%);
+		opacity: 0;
+		transition: opacity 0.15s;
 	}
 
 	.lamp.is-lit {
-		background: #ffd36a;
-		color: #2a1c00;
+		z-index: 1;
+		color: #3b2600;
+		text-shadow: 0 0 0.3cqw rgb(255 240 200 / 0.8);
 		box-shadow:
-			0 0 3cqw rgb(255 196 64 / 0.7),
-			inset 0 0 1.5cqw rgb(255 255 255 / 0.6);
+			inset 0 0.3cqw 0.45cqw rgb(110 55 0 / 0.35),
+			0 0 0.5cqw rgb(255 214 120 / 0.9),
+			0 0 2.6cqw rgb(255 176 40 / 0.6);
 	}
 
-	.lamp.is-lit[data-lamp='UPLINK ACTY'],
-	.lamp.is-lit[data-lamp='KEY REL'],
-	.lamp.is-lit[data-lamp='OPR ERR'],
-	.lamp.is-lit[data-lamp='STBY'],
-	.lamp.is-lit[data-lamp='NO ATT'] {
-		background: #fafaf2;
-		box-shadow: 0 0 3cqw rgb(255 255 240 / 0.6);
+	.lamp.is-lit::before {
+		opacity: 1;
 	}
 
+	/* Status lamps light up white, caution lamps amber */
+	.lamp:is([data-lamp='UPLINK ACTY'], [data-lamp='KEY REL'], [data-lamp='OPR ERR'], [data-lamp='STBY'], [data-lamp='NO ATT'])::before {
+		background: radial-gradient(85% 75% at 50% 50%, #ffffff 0%, #f6f5ea 50%, #d9d8c9 100%);
+	}
+
+	.lamp.is-lit:is([data-lamp='UPLINK ACTY'], [data-lamp='KEY REL'], [data-lamp='OPR ERR'], [data-lamp='STBY'], [data-lamp='NO ATT']) {
+		color: #262622;
+		box-shadow:
+			inset 0 0.3cqw 0.45cqw rgb(0 0 0 / 0.2),
+			0 0 0.5cqw rgb(255 255 240 / 0.9),
+			0 0 2.6cqw rgb(255 255 235 / 0.5);
+	}
+
+	/* Electroluminescent display: deep green-black glass, unlit segments barely visible */
 	.el {
 		display: grid;
 		gap: 1.6cqw;
 		align-content: start;
 		padding: 2.4cqw;
-		background: var(--glass);
-		border-radius: 0.6cqw;
-		box-shadow: inset 0 0 2cqw rgb(0 0 0 / 0.9);
-		filter: drop-shadow(0 0 0.8cqw rgb(108 245 154 / 0.35));
+		border-radius: 0.5cqw;
+		background: radial-gradient(120% 100% at 50% 30%, #101a14, var(--glass) 75%);
+		box-shadow: inset 0 0 2.4cqw rgb(0 0 0 / 0.9);
 	}
 
 	.el-row {
@@ -241,36 +364,60 @@ const keys = [
 
 	.el-label {
 		padding: 0.5cqw 1cqw;
-		background: var(--el);
-		color: var(--glass);
+		border-radius: 0.3cqw;
+		background: linear-gradient(180deg, #a6ffc6, #6cf59a);
+		color: #06130b;
 		font-size: 2.2cqw;
 		line-height: 1.1;
 		letter-spacing: 0.05em;
-		border-radius: 0.3cqw;
+		box-shadow:
+			0 0 0.35cqw rgb(150 255 190 / 0.8),
+			0 0 1.6cqw rgb(108 245 154 / 0.45);
 	}
 
 	.acty {
 		align-self: start;
-		background: rgb(108 245 154 / 0.08);
+		background: rgb(108 245 154 / 0.07);
 		color: transparent;
-		transition: background-color 0.08s;
+		box-shadow: none;
+		transition:
+			background-color 0.08s,
+			box-shadow 0.08s;
 	}
 
 	.acty.is-lit {
-		background: var(--el);
-		color: var(--glass);
+		background: linear-gradient(180deg, #a6ffc6, #6cf59a);
+		color: #06130b;
+		box-shadow:
+			0 0 0.35cqw rgb(150 255 190 / 0.8),
+			0 0 1.6cqw rgb(108 245 154 / 0.45);
 	}
 
+	/* Each register sits under a glowing EL bar */
 	.el-register {
+		position: relative;
 		display: flex;
 		justify-content: flex-end;
 		padding-top: 1.4cqw;
-		border-top: 0.35cqw solid rgb(108 245 154 / 0.85);
 	}
 
+	.el-register::before {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		height: 0.35cqw;
+		border-radius: 0.2cqw;
+		background: #8dffb5;
+		box-shadow:
+			0 0 0.3cqw rgb(150 255 190 / 0.8),
+			0 0 1.2cqw rgb(108 245 154 / 0.4);
+	}
+
+	/* Phosphor bloom: a tight halo and a wide one */
 	.digits {
 		display: flex;
 		gap: 0.7cqw;
+		filter: drop-shadow(0 0 0.3cqw rgb(120 255 170 / 0.75)) drop-shadow(0 0 1.2cqw rgb(108 245 154 / 0.35));
 	}
 
 	.d {
@@ -279,7 +426,7 @@ const keys = [
 
 	.d :global(polygon) {
 		fill: var(--el);
-		opacity: 0.06;
+		opacity: 0.045;
 		transition: opacity 0.06s;
 	}
 
@@ -295,56 +442,74 @@ const keys = [
 	.d[data-d='9'] :global(:is(.s-a, .s-b, .s-c, .s-d, .s-f, .s-g)),
 	.sign[data-s='+'] :global(polygon),
 	.sign[data-s='-'] :global(.s-h) {
+		fill: var(--el-on);
 		opacity: 1;
 	}
 
+	/* Keyboard: a recessed plate, each key in its own well */
 	.keys {
+		position: relative;
 		display: grid;
 		grid-template-columns: repeat(7, 1fr);
 		grid-template-rows: repeat(6, 5.6cqw);
 		gap: 1.4cqw;
-		margin-top: 4cqw;
-		padding: 2cqw;
-		background: var(--face-dark);
-		border-radius: 0.8cqw;
+		margin-top: 3.6cqw;
+		padding: 2.2cqw 2cqw 2.6cqw;
+		border-radius: 1.1cqw;
+		background: linear-gradient(180deg, #969a97, #a7aba8);
+		box-shadow:
+			0 -0.15cqw 0 rgb(0 0 0 / 0.18),
+			0 0.18cqw 0 rgb(255 255 255 / 0.55),
+			inset 0 0.5cqw 0.8cqw rgb(0 0 0 / 0.32);
+		isolation: isolate;
 	}
 
+	/* Black plastic keys with white legends, slightly dished on top */
 	.key {
+		position: relative;
 		display: grid;
 		place-items: center;
-		background: radial-gradient(circle at 50% 35%, #34383a, #141617 75%);
-		color: #f0f0ea;
-		border-radius: 0.8cqw;
+		border-radius: 0.75cqw;
+		background:
+			linear-gradient(180deg, rgb(255 255 255 / 0.11), transparent 16%),
+			radial-gradient(150% 120% at 50% 115%, #303436, #141617 58%, #0a0b0c);
+		color: #ecebe3;
 		font-size: 2.6cqw;
 		line-height: 1;
 		text-align: center;
+		text-shadow: 0 0 0.12cqw rgb(255 255 255 / 0.3);
 		box-shadow:
-			inset 0 0.3cqw 0 rgb(255 255 255 / 0.12),
-			0 0.6cqw 0 #0a0b0b;
+			inset 0 0.14cqw 0 rgb(255 255 255 / 0.2),
+			inset 0 -0.18cqw 0.12cqw rgb(0 0 0 / 0.65),
+			0 0.55cqw 0 #050606,
+			0 0.75cqw 0.8cqw rgb(0 0 0 / 0.5);
 		transition:
 			transform 0.08s,
 			box-shadow 0.08s;
 	}
 
-	.key[data-key='+'],
-	.key[data-key='−'],
-	.key[data-key='0'],
-	.key[data-key='1'],
-	.key[data-key='2'],
-	.key[data-key='3'],
-	.key[data-key='4'],
-	.key[data-key='5'],
-	.key[data-key='6'],
-	.key[data-key='7'],
-	.key[data-key='8'],
-	.key[data-key='9'] {
+	.key::before {
+		content: '';
+		position: absolute;
+		inset: -0.45cqw -0.45cqw -0.95cqw;
+		z-index: -1;
+		border-radius: 1cqw;
+		background: linear-gradient(180deg, #353937, #5b5f5c);
+		box-shadow:
+			inset 0 0.4cqw 0.6cqw rgb(0 0 0 / 0.75),
+			0 0.12cqw 0 rgb(255 255 255 / 0.4);
+	}
+
+	.key:is([data-key='+'], [data-key='−'], [data-key='0'], [data-key='1'], [data-key='2'], [data-key='3'], [data-key='4'], [data-key='5'], [data-key='6'], [data-key='7'], [data-key='8'], [data-key='9']) {
 		font-size: 4.2cqw;
 	}
 
 	.key.is-pressed {
-		transform: translateY(0.5cqw);
+		transform: translateY(0.45cqw);
 		box-shadow:
-			inset 0 0.3cqw 0 rgb(255 255 255 / 0.12),
-			0 0.1cqw 0 #0a0b0b;
+			inset 0 0.14cqw 0 rgb(255 255 255 / 0.14),
+			inset 0 -0.18cqw 0.12cqw rgb(0 0 0 / 0.65),
+			0 0.1cqw 0 #050606,
+			0 0.2cqw 0.3cqw rgb(0 0 0 / 0.5);
 	}
 </style>
