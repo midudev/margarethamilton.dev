@@ -1,0 +1,172 @@
+---
+import { getLang, translator } from '../../i18n';
+
+/**
+ * «Ingeniería de software»: al principio las letras se ríen (se tambalean,
+ * finas, torcidas). Con el scroll se enderezan y ganan peso: se la toman en serio.
+ */
+const t = translator(getLang(Astro));
+const term = t({ es: ['Ingeniería', 'de software'], en: ['Software', 'engineering'] });
+
+const rand = (i: number) => {
+	const x = Math.sin(i * 78.233 + 1.7) * 43758.5453;
+	return x - Math.floor(x);
+};
+
+let i = 0;
+const total = term.join('').replace(/ /g, '').length;
+const words = term.map((line) =>
+	line.split(' ').map((word) =>
+		word.split('').map((char) => {
+			const n = i++;
+			return {
+				char,
+				r: ((rand(n) - 0.5) * 50).toFixed(1),
+				y: ((rand(n + 99) - 0.5) * 0.7).toFixed(2),
+				d: (n / (total - 1)).toFixed(3),
+				jd: (rand(n + 7) * -1.2).toFixed(2),
+			};
+		}),
+	),
+);
+---
+
+<section class="scene ingenieria" data-scene="ingenieria" data-theme="blueprint" data-year="1969" style="--len: 460">
+	<div class="stage">
+		<div class="grid" aria-hidden="true"></div>
+
+		<h2 class="term">
+			<span class="sr-only">{term.join(' ')}</span>
+			{
+				words.map((line) => (
+					<span class="term-line" aria-hidden="true">
+						{line.map((word, wi) => (
+							<>
+								<span class="w">
+									{word.map(({ char, r, y, d, jd }) => (
+										<span class="l" style={`--r:${r}deg;--y:${y}em;--d:${d};--jd:${jd}s`}>
+											{char}
+										</span>
+									))}
+								</span>
+								{wi < line.length - 1 && ' '}
+							</>
+						))}
+					</span>
+				))
+			}
+		</h2>
+
+		<div class="text stack">
+			<p class="beat" data-beat="0 0.32">
+				{
+					t({
+						es: 'Margaret empezó a llamar así a su trabajo. Durante mucho tiempo, fue una broma.',
+						en: 'Margaret started calling her work that. For a long time, it was a joke.',
+					})
+				}
+			</p>
+			<p class="beat" data-beat="0.32 0.6">{t({ es: 'Hasta que dejó de serlo.', en: 'Until it wasn’t.' })}</p>
+			<p class="beat" data-beat="0.6 0.78">{t({ es: 'Hoy es el nombre de nuestra profesión.', en: 'Today it’s the name of our profession.' })}</p>
+			<blockquote class="beat quote" data-beat="0.78">
+				<p>
+					{
+						t({
+							es: '«El software acabó ganándose, por necesidad, el mismo respeto que cualquier otra disciplina».',
+							en: '“Software eventually and necessarily gained the same respect as any other discipline.”',
+						})
+					}
+				</p>
+				<footer>{t({ es: 'Margaret Hamilton, en El País, 2018', en: 'Margaret Hamilton, to El País, 2018' })}</footer>
+			</blockquote>
+		</div>
+	</div>
+</section>
+
+<style>
+	@property --jig {
+		syntax: '<number>';
+		inherits: false;
+		initial-value: 0;
+	}
+
+	.stage {
+		--k-all: clamp(0, calc((var(--p, 1) - 0.3) / 0.28), 1);
+		display: grid;
+		grid-template-rows: 1fr auto;
+		align-items: center;
+		padding: 8vh var(--gutter) clamp(3.5rem, 12vh, 8rem);
+	}
+
+	/* Cuadrícula de plano que aparece cuando el término se toma en serio */
+	.grid {
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px) 0 0 / 2rem 2rem,
+			linear-gradient(90deg, rgb(255 255 255 / 0.07) 1px, transparent 1px) 0 0 / 2rem 2rem;
+		opacity: var(--k-all);
+	}
+
+	.term {
+		position: relative;
+		font-size: clamp(3rem, 0.6rem + 10.5vw, 12rem);
+		font-weight: 400;
+		line-height: 0.95;
+		letter-spacing: -0.03em;
+	}
+
+	.term-line {
+		display: block;
+	}
+
+	.w {
+		display: inline-block;
+		white-space: nowrap;
+	}
+
+	.l {
+		--k: clamp(0, calc((var(--p, 1) - 0.3 - var(--d) * 0.16) / 0.12), 1);
+		display: inline-block;
+		font-weight: calc(300 + 300 * var(--k));
+		transform: translateY(calc(var(--y) * (1 - var(--k))))
+			rotate(calc((var(--r) + var(--jig) * 9deg) * (1 - var(--k))));
+		animation: jig 0.42s ease-in-out var(--jd) infinite alternate;
+	}
+
+	@keyframes jig {
+		from {
+			--jig: -1;
+		}
+		to {
+			--jig: 1;
+		}
+	}
+
+	.text p,
+	.quote p {
+		max-width: 26ch;
+		font-size: var(--t-lead);
+		line-height: 1.12;
+		letter-spacing: -0.015em;
+		text-wrap: pretty;
+	}
+
+	.quote footer {
+		margin-top: 1rem;
+		color: var(--fg-dim);
+		font-size: var(--t-body);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.l {
+			animation: none;
+		}
+	}
+
+	html:not(.js) .l {
+		transform: none;
+		font-weight: 600;
+		animation: none;
+	}
+</style>
