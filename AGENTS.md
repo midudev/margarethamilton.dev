@@ -8,6 +8,10 @@ astro dev --background
 
 Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
 
+## Code comments
+
+Always write code comments in English: in `.astro`, `.ts`, `.mjs`, CSS and HTML comments alike. This applies only to comments; the site's copy stays bilingual (Spanish and English) through `t({ es, en })`.
+
 ## Documentation
 
 Full documentation: https://docs.astro.build
