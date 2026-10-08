@@ -1,0 +1,12 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "margarethamilton-dev",
+	"compatibility_date": "2026-10-01",
+	// Sitio estático: Astro genera ./dist y el Worker solo sirve los assets
+	"assets": {
+		"directory": "./dist",
+		"html_handling": "auto-trailing-slash",
+	},
+	"routes": [{ "pattern": "margarethamilton.dev", "custom_domain": true }],
+	"observability": { "enabled": true },
+}
