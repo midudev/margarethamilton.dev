@@ -4,6 +4,9 @@
  * flashes on arrival and its light condenses into the glyph. `start`, `spread` and `dur`
  * are ranges of the scene progress (0–1); the starting positions are
  * computed by src/scripts/stars.ts.
+ *
+ * Each letter's progress is set from JS, and only on the letters that are moving:
+ * driving them all from the scene's --p would restyle every letter on every frame.
  */
 interface Props {
 	text: string;
@@ -22,13 +25,13 @@ const words = text.split(' ').map((word) =>
 );
 ---
 
-<span class:list={['star-text', className]} style={`--start:${start};--spread:${spread};--dur:${dur}`} aria-hidden="true">
+<span class:list={['star-text', 'still', className]} data-start={start} data-spread={spread} data-dur={dur} aria-hidden="true">
 	{
 		words.map((word, i) => (
 			<>
 				<span class="w">
 					{word.map(({ char, d }) => (
-						<span class="l" style={`--d:${d}`}>
+						<span class="l" data-d={d}>
 							<span class="g">{char}</span>
 						</span>
 					))}
@@ -39,7 +42,64 @@ const words = text.split(' ').map((word) =>
 	}
 </span>
 
+<script>
+	import { $$ } from '../scripts/dom';
+	import { clamp, onProgress } from '../scripts/scroll';
+
+	for (const text of $$('.star-text')) {
+		const scene = text.closest<HTMLElement>('[data-scene]')!;
+		const [start, spread, dur] = [text.dataset.start, text.dataset.spread, text.dataset.dur].map(Number);
+		const letters = $$('.l', text).map((el) => ({ el, d: Number(el.dataset.d), t: -1 }));
+
+		onProgress(scene, (p) => {
+			for (const letter of letters) {
+				const t = Math.round(clamp((p - start - letter.d * spread) / dur) * 1000) / 1000;
+				if (t === letter.t) continue;
+				letter.t = t;
+				letter.el.style.setProperty('--t', String(t));
+			}
+		});
+	}
+</script>
+
 <style>
+	/* Typed as numbers, the letter's values don't have to be parsed again on every restyle: it costs half */
+	@property --t {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --m0 {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --m {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --f {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --out {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --g0 {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --g {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+
 	.w {
 		display: inline-block;
 		white-space: nowrap;
@@ -47,7 +107,7 @@ const words = text.split(' ').map((word) =>
 
 	.l {
 		/* t: this letter's progress. m: the star's journey. f: flash. g: glyph reveal */
-		--t: clamp(0, calc((var(--p, 0) - var(--start) - var(--d) * var(--spread)) / var(--dur)), 1);
+		--t: 0;
 		--m0: clamp(0, calc(var(--t) / 0.72), 1);
 		--m: calc(var(--m0) * var(--m0) * (3 - 2 * var(--m0)));
 		--f: clamp(0, calc((var(--t) - 0.6) / 0.2), 1);

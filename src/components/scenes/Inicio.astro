@@ -83,8 +83,10 @@ const [born, died] = t({
 </script>
 
 <style>
-	/* The Earth over the Moon pulls away and fades while the stars form the quote */
-	.stage {
+	/* The Earth over the Moon pulls away and fades while the stars form the quote.
+	   Declared only where it's used, so the quote's letters don't inherit a value that changes on every frame */
+	.earth,
+	.stage > :global(.starfield) {
 		--fade: clamp(0, (var(--p, 1) - 0.05) / 0.27, 1);
 		--below: var(--fade);
 	}
