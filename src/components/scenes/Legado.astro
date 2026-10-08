@@ -1,0 +1,154 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../../assets/photos/margaret-1989.jpg';
+import medal from '../../assets/photos/medal-of-freedom-2016.jpg';
+import { getLang, translator } from '../../i18n';
+
+const t = translator(getLang(Astro));
+---
+
+<section class="scene legado" data-scene="legado" data-theme="space" data-year="1976" style="--len: 520">
+	<div class="stage">
+		<figure class="layer portrait" style="--a: 0.2; --b: 0.5">
+			<Image
+				src={portrait}
+				alt={t({
+					es: 'Margaret Hamilton en 1989, sentada en su despacho junto a un ordenador',
+					en: 'Margaret Hamilton in 1989, sitting in her office next to a computer',
+				})}
+				widths={[527]}
+				sizes="(max-width: 760px) 70vw, 30vw"
+			/>
+		</figure>
+		<div class="layer shade" style="--a: 0.62">
+			<Image
+				src={medal}
+				alt={t({
+					es: 'Barack Obama coloca la Medalla Presidencial de la Libertad a Margaret Hamilton, entre aplausos',
+					en: 'Barack Obama places the Presidential Medal of Freedom on Margaret Hamilton, to applause',
+				})}
+				widths={[720, 1280]}
+				sizes="100vw"
+			/>
+		</div>
+
+		<div class="text stack">
+			<p class="beat" data-beat="0 0.2" data-year="1976">
+				{
+					t({
+						es: 'Deja el MIT y funda, con Saydean Zeldin, su propia empresa: Higher Order Software.',
+						en: 'She leaves MIT and co-founds her own company with Saydean Zeldin: Higher Order Software.',
+					})
+				}
+			</p>
+			<p class="beat" data-beat="0.2 0.4" data-year="1986">
+				{
+					t({
+						es: 'Después funda Hamilton Technologies y crea el Universal Systems Language.',
+						en: 'Later she founds Hamilton Technologies and creates the Universal Systems Language.',
+					})
+				}
+			</p>
+			<p class="beat" data-beat="0.4 0.62" data-year="2003">
+				{
+					t({
+						es: 'La NASA le concede el Exceptional Space Act Award.',
+						en: 'NASA gives her the Exceptional Space Act Award.',
+					})
+				}
+			</p>
+			<p class="beat" data-beat="0.62 0.8" data-year="2016">
+				{
+					t({
+						es: 'Barack Obama le entrega la Medalla Presidencial de la Libertad.',
+						en: 'Barack Obama awards her the Presidential Medal of Freedom.',
+					})
+				}
+			</p>
+			<blockquote class="beat quote" data-beat="0.8">
+				<p>
+					{
+						t({
+							es: '«Definió nuevas formas de ingeniería de software y ayudó a lanzar una industria que cambiaría para siempre la historia de la humanidad».',
+							en: '“Hamilton defined new forms of software engineering and helped launch an industry that would forever change human history.”',
+						})
+					}
+				</p>
+				<footer>
+					{t({ es: 'Mención de la Medalla Presidencial de la Libertad', en: 'Presidential Medal of Freedom citation' })}
+				</footer>
+			</blockquote>
+		</div>
+	</div>
+</section>
+
+<style>
+	.portrait {
+		display: grid;
+		place-items: center end;
+		padding: 10vh clamp(1rem, 10vw, 12rem);
+	}
+
+	.portrait img {
+		width: min(30vw, 46vh);
+		height: auto;
+		filter: grayscale(0.2);
+	}
+
+	.shade > img {
+		object-position: 60% 30%;
+	}
+
+	.shade::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(0deg, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0) 60%);
+	}
+
+	.text {
+		position: absolute;
+		left: var(--gutter);
+		right: var(--gutter);
+		bottom: clamp(3.5rem, 12vh, 8rem);
+		align-items: end;
+	}
+
+	.text p {
+		max-width: 22ch;
+		font-size: var(--t-lead);
+		line-height: 1.12;
+		letter-spacing: -0.015em;
+		text-wrap: pretty;
+	}
+
+	.quote p {
+		max-width: 28ch;
+	}
+
+	.quote footer {
+		margin-top: 1rem;
+		color: var(--fg-dim);
+		font-size: var(--t-body);
+	}
+
+	@media (max-width: 760px) {
+		.portrait {
+			place-items: start center;
+		}
+
+		.portrait img {
+			width: min(64vw, 40vh);
+		}
+
+		.text p {
+			font-size: 1.35rem;
+		}
+	}
+
+	html:not(.js) .layer,
+	html:not(.js) .text {
+		position: relative;
+		inset: auto;
+	}
+</style>
