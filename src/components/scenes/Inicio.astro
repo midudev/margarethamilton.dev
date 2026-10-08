@@ -13,6 +13,11 @@ const [line1, line2] = t({
 	es: ['No había más remedio que ser pioneros.', 'No había tiempo para ser principiantes.'],
 	en: ['There was no choice but to be pioneers.', 'No time to be beginners.'],
 });
+
+const [born, died] = t({
+	es: ['17 de agosto de 1936', '30 de septiembre de 2026'],
+	en: ['August 17, 1936', 'September 30, 2026'],
+});
 ---
 
 <section class="scene inicio" data-scene="inicio" data-theme="space" data-year="1936" style="--len: 440">
@@ -42,7 +47,7 @@ const [line1, line2] = t({
 		</div>
 
 		<header class="hero">
-			<p class="mono dates">{t({ es: '17 de agosto de 1936 – 30 de septiembre de 2026', en: 'August 17, 1936 – September 30, 2026' })}</p>
+			<p class="mono dates"><span>{born} –</span> <span>{died}</span></p>
 			<h1><span>Margaret</span> <span>Hamilton</span></h1>
 			<figure class="portrait">
 				<Image
@@ -167,6 +172,11 @@ const [line1, line2] = t({
 		opacity: 0.8;
 	}
 
+	/* If the dates don't fit on one line, they break after the dash, never inside a date */
+	.dates span {
+		white-space: nowrap;
+	}
+
 	/* As tall as the dates and the name; leaves room for the scroll hint */
 	.portrait {
 		grid-area: portrait;
@@ -185,18 +195,29 @@ const [line1, line2] = t({
 		outline-offset: -1px;
 	}
 
+	/* On mobile: portrait and dates side by side, and the name as wide as the screen allows */
 	@media (max-width: 640px) {
 		.hero {
-			grid-template-columns: 1fr;
+			grid-template-columns: auto 1fr;
 			grid-template-areas:
-				'portrait'
-				'dates'
-				'name';
+				'portrait dates'
+				'name name';
+			column-gap: 1.25rem;
+		}
+
+		.hero h1 {
+			font-size: min(22vw, 10.5svh);
+		}
+
+		/* Scales with the screen so “30 de septiembre de 2026” fits next to the portrait */
+		.dates {
+			display: grid;
+			font-size: min(var(--t-small), 3.5vw);
 		}
 
 		.portrait {
-			width: min(34vw, 9rem);
-			margin: 0 0 1.75rem;
+			width: min(34vw, 18svh);
+			margin: 0 0 1.5rem;
 		}
 	}
 
