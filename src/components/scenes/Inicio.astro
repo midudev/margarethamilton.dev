@@ -1,0 +1,285 @@
+---
+import { Image } from 'astro:assets';
+import StarText from '../StarText.astro';
+import Starfield from '../Starfield.astro';
+import earth from '../../assets/photos/earth-over-moon.jpg';
+import portrait from '../../assets/photos/margaret-1995.jpg';
+import { getLang, translator } from '../../i18n';
+
+const lang = getLang(Astro);
+const t = translator(lang);
+
+const [line1, line2] = t({
+	es: ['No había más remedio que ser pioneros.', 'No había tiempo para ser principiantes.'],
+	en: ['There was no choice but to be pioneers.', 'No time to be beginners.'],
+});
+---
+
+<section class="scene inicio" data-scene="inicio" data-theme="space" data-year="1936" style="--len: 440">
+	<div class="stage">
+		<div class="earth">
+			<Image
+				src={earth}
+				alt={t({
+					es: 'La Tierra asomando sobre el horizonte de la Luna, fotografiada desde el Apollo 11',
+					en: 'Earth rising over the lunar horizon, photographed from Apollo 11',
+				})}
+				widths={[720, 1280, 1920]}
+				sizes="100vw"
+				loading="eager"
+				fetchpriority="high"
+			/>
+		</div>
+
+		<Starfield />
+
+		<div class="sky" data-sky>
+			<blockquote class="quote">
+				<p><StarText text={line1} start={0.16} spread={0.24} /></p>
+				<p><StarText text={line2} start={0.4} spread={0.24} /></p>
+				<span class="sr-only">{line1} {line2}</span>
+			</blockquote>
+		</div>
+
+		<header class="hero">
+			<p class="mono dates">{t({ es: '17 de agosto de 1936 – 30 de septiembre de 2026', en: 'August 17, 1936 – September 30, 2026' })}</p>
+			<h1><span>Margaret</span> <span>Hamilton</span></h1>
+			<figure class="portrait">
+				<Image
+					src={portrait}
+					alt={t({
+						es: 'Retrato en blanco y negro de Margaret Hamilton en 1995, con el pelo suelto, sobre fondo oscuro',
+						en: 'Black-and-white portrait of Margaret Hamilton in 1995, hair down, against a dark background',
+					})}
+					widths={[320, 640, 960]}
+					sizes="(max-width: 640px) 34vw, 22vw"
+					loading="eager"
+				/>
+			</figure>
+		</header>
+
+		<div class="hint" aria-hidden="true"><span></span></div>
+
+		<div class="attribution beat" data-beat="0.86">
+			<span class="avatar"><Image src={portrait} alt="" widths={[128, 256]} sizes="6rem" /></span>
+			<p>
+				Margaret Hamilton, 2009
+				{lang === 'es' && <span class="mono">“There was no choice but to be pioneers; no time to be beginners.”</span>}
+			</p>
+		</div>
+	</div>
+</section>
+
+<script>
+	import { $ } from '../../scripts/dom';
+	import { starfield } from '../../scripts/stars';
+
+	starfield($('[data-scene="inicio"] .stage')!, { photo: true });
+</script>
+
+<style>
+	/* La Tierra sobre la Luna se aleja y se apaga mientras las estrellas forman la cita */
+	.stage {
+		--fade: clamp(0, (var(--p, 1) - 0.05) / 0.27, 1);
+		--below: var(--fade);
+	}
+
+	.earth {
+		position: absolute;
+		inset: 0;
+		opacity: calc(1 - var(--fade));
+	}
+
+	.earth img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 50% 40%;
+		transform: scale(calc(1 + 0.1 * var(--fade)));
+	}
+
+	.earth::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(0deg, rgb(0 0 0 / 0.88), rgb(0 0 0 / 0.35) 40%, rgb(0 0 0 / 0) 60%);
+	}
+
+	.sky {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		padding-inline: var(--gutter);
+	}
+
+	.quote {
+		max-width: 16ch;
+		font-size: var(--t-display);
+		font-weight: 400;
+		line-height: 1.04;
+		letter-spacing: -0.015em;
+		text-align: center;
+		text-wrap: balance;
+	}
+
+	.quote p + p {
+		margin-top: 0.45em;
+	}
+
+	.hero {
+		position: absolute;
+		left: var(--gutter);
+		right: var(--gutter);
+		bottom: clamp(3rem, 9vh, 6rem);
+		display: grid;
+		grid-template-columns: 1fr auto;
+		grid-template-areas:
+			'dates portrait'
+			'name portrait';
+		align-items: end;
+		column-gap: var(--gutter);
+		opacity: calc(1 - clamp(0, (var(--p, 0) - 0.05) / 0.11, 1));
+		transform: translateY(calc(clamp(0, (var(--p, 0) - 0.05) / 0.11, 1) * -4vh));
+	}
+
+	.hero h1 {
+		grid-area: name;
+		font-size: var(--t-giant);
+		font-weight: 300;
+		line-height: 0.86;
+		letter-spacing: -0.035em;
+	}
+
+	.hero h1 span {
+		display: block;
+	}
+
+	/* Con este sangrado la «g» de Margaret cae entre la «a» y la «m», no sobre el punto de la «i» */
+	.hero h1 span + span {
+		padding-left: 0.42em;
+	}
+
+	.dates {
+		grid-area: dates;
+		margin-bottom: 1.5rem;
+		color: var(--fg);
+		opacity: 0.8;
+	}
+
+	/* Tan alto como las fechas y el nombre; deja sitio a la pista de scroll */
+	.portrait {
+		grid-area: portrait;
+		width: calc((var(--t-giant) * 1.72 + 2.75rem) * 0.75);
+		margin-right: clamp(1.5rem, 3vw, 3rem);
+	}
+
+	.portrait img {
+		width: 100%;
+		height: auto;
+		aspect-ratio: 3 / 4;
+		object-fit: cover;
+		filter: grayscale(1) contrast(1.06);
+		box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.55);
+		outline: 1px solid rgb(255 255 255 / 0.1);
+		outline-offset: -1px;
+	}
+
+	@media (max-width: 640px) {
+		.hero {
+			grid-template-columns: 1fr;
+			grid-template-areas:
+				'portrait'
+				'dates'
+				'name';
+		}
+
+		.portrait {
+			width: min(34vw, 9rem);
+			margin: 0 0 1.75rem;
+		}
+	}
+
+	.hint {
+		position: absolute;
+		right: var(--gutter);
+		bottom: clamp(3rem, 9vh, 6rem);
+		width: 1px;
+		height: 4.5rem;
+		background: rgb(255 255 255 / 0.18);
+		overflow: hidden;
+		opacity: calc(1 - clamp(0, var(--p, 0) / 0.04, 1));
+	}
+
+	.hint span {
+		display: block;
+		height: 40%;
+		background: var(--fg);
+		animation: drop 2.2s var(--ease-out) infinite;
+	}
+
+	@keyframes drop {
+		from {
+			transform: translateY(-100%);
+		}
+		to {
+			transform: translateY(260%);
+		}
+	}
+
+	.attribution {
+		position: absolute;
+		left: var(--gutter);
+		right: var(--gutter);
+		bottom: clamp(3rem, 9vh, 6rem);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		font-size: var(--t-body);
+	}
+
+	.attribution p {
+		display: grid;
+		gap: 0.35rem;
+	}
+
+	.attribution .mono {
+		color: var(--fg-dim);
+	}
+
+	/* El mismo retrato del principio, recortado a la cara */
+	.avatar {
+		flex: none;
+		width: clamp(3.25rem, 2.6rem + 1.6vw, 4.5rem);
+		aspect-ratio: 1;
+		border-radius: 50%;
+		overflow: hidden;
+		outline: 1px solid rgb(255 255 255 / 0.15);
+		outline-offset: -1px;
+	}
+
+	.avatar img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 45% 45%;
+		filter: grayscale(1) contrast(1.06);
+		scale: 1.3;
+		transform-origin: 45% 47%;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hint span {
+			animation: none;
+		}
+	}
+
+	html:not(.js) .sky,
+	html:not(.js) .hero,
+	html:not(.js) .attribution {
+		position: relative;
+		inset: auto;
+		margin-block: 10vh;
+	}
+</style>
