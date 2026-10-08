@@ -1,0 +1,26 @@
+---
+/** Campo de estrellas de fondo; lo pinta src/scripts/stars.ts. Bajo el horizonte de la foto solo se ve con --below */
+---
+
+<canvas class="starfield" data-starfield aria-hidden="true"></canvas>
+
+<style>
+	.starfield {
+		--mask: linear-gradient(
+			to bottom,
+			#000 calc(var(--horizon, 45%) - 2%),
+			rgb(0 0 0 / var(--below, 0)) calc(var(--horizon, 45%) + 1%)
+		);
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		-webkit-mask-image: var(--mask);
+		mask-image: var(--mask);
+	}
+
+	html:not(.js) .starfield {
+		display: none;
+	}
+</style>

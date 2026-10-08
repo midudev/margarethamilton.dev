@@ -1,0 +1,117 @@
+---
+/**
+ * Texto cuyas letras nacen de estrellas. Cada estrella viaja hasta su letra,
+ * destella al llegar y su luz se condensa en el glifo. `start`, `spread` y `dur`
+ * son tramos del progreso (0–1) de la escena; las posiciones de partida las
+ * calcula src/scripts/stars.ts.
+ */
+interface Props {
+	text: string;
+	start: number;
+	spread?: number;
+	dur?: number;
+	class?: string;
+}
+
+const { text, start, spread = 0.2, dur = 0.16, class: className } = Astro.props;
+
+const chars = text.replace(/ /g, '').length;
+let index = 0;
+const words = text.split(' ').map((word) =>
+	word.split('').map((char) => ({ char, d: (index++ / Math.max(1, chars - 1)).toFixed(3) })),
+);
+---
+
+<span class:list={['star-text', className]} style={`--start:${start};--spread:${spread};--dur:${dur}`} aria-hidden="true">
+	{
+		words.map((word, i) => (
+			<>
+				<span class="w">
+					{word.map(({ char, d }) => (
+						<span class="l" style={`--d:${d}`}>
+							<span class="g">{char}</span>
+						</span>
+					))}
+				</span>
+				{i < words.length - 1 && ' '}
+			</>
+		))
+	}
+</span>
+
+<style>
+	.w {
+		display: inline-block;
+		white-space: nowrap;
+	}
+
+	.l {
+		/* t: progreso de esta letra. m: viaje de la estrella. f: destello. g: aparición del glifo */
+		--t: clamp(0, calc((var(--p, 0) - var(--start) - var(--d) * var(--spread)) / var(--dur)), 1);
+		--m0: clamp(0, calc(var(--t) / 0.72), 1);
+		--m: calc(var(--m0) * var(--m0) * (3 - 2 * var(--m0)));
+		--f: clamp(0, calc((var(--t) - 0.6) / 0.2), 1);
+		--out: clamp(0, calc((var(--t) - 0.74) / 0.22), 1);
+		--g0: clamp(0, calc((var(--t) - 0.66) / 0.34), 1);
+		--g: calc(var(--g0) * var(--g0) * (3 - 2 * var(--g0)));
+		position: relative;
+		display: inline-block;
+	}
+
+	/* La luz se condensa en la letra: llega desenfocada y brillante, y se asienta */
+	.g {
+		display: inline-block;
+		color: rgb(236 236 230 / var(--g));
+		text-shadow:
+			0 0 calc((1 - var(--g)) * 0.5em) rgb(var(--tint, 255 255 255) / calc((1 - var(--g)) * var(--f))),
+			0 0 calc((1 - var(--g)) * 0.12em) rgb(255 255 255 / calc((1 - var(--g)) * var(--f)));
+		transform: scale(calc(1.14 - 0.14 * var(--g)));
+		transform-origin: 50% 60%;
+	}
+
+	/* La estrella: un punto nítido que viaja en una curva suave y destella al llegar */
+	.l::before {
+		--size: calc((1.2 + var(--mag, 0.8) * 1.8) * 1px);
+		--arc: sin(calc(var(--m) * 180deg));
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: 55%;
+		width: var(--size);
+		height: var(--size);
+		margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+		border-radius: 50%;
+		background: rgb(var(--tint, 255 255 255));
+		box-shadow: 0 0 calc(var(--size) * (0.8 + 5 * var(--f))) calc(var(--size) * 0.6 * var(--f))
+			rgb(var(--tint, 255 255 255) / calc(0.35 + 0.45 * var(--f)));
+		opacity: calc((var(--mag, 0.8) + (1 - var(--mag, 0.8)) * var(--m)) * (1 - var(--out)));
+		transform: translate(
+				calc(var(--dx, 0px) * (1 - var(--m)) + var(--ax, 0px) * var(--arc)),
+				calc(var(--dy, 0px) * (1 - var(--m)) + var(--ay, 0px) * var(--arc))
+			)
+			scale(calc(1 + 1.6 * var(--f)));
+		will-change: transform;
+		pointer-events: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.g {
+			transform: none;
+			text-shadow: none;
+		}
+
+		.l::before {
+			display: none;
+		}
+	}
+
+	html:not(.js) .g {
+		color: inherit;
+		transform: none;
+		text-shadow: none;
+	}
+
+	html:not(.js) .l::before {
+		display: none;
+	}
+</style>
