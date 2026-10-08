@@ -293,7 +293,7 @@ const arc = (x: number, back: boolean) =>
 		position: absolute;
 		left: var(--gutter);
 		right: var(--gutter);
-		bottom: clamp(3.5rem, 12vh, 8rem);
+		bottom: calc(clamp(3.5rem, 12vh, 8rem) + var(--chrome));
 		align-items: end;
 	}
 

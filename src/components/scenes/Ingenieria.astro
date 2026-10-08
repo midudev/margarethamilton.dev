@@ -128,7 +128,7 @@ const words = term.map((line) =>
 
 <script>
 	import { $, $$ } from '../../scripts/dom';
-	import { onProgress, segment } from '../../scripts/scroll';
+	import { onProgress, onResize, segment } from '../../scripts/scroll';
 
 	// Part of the scene in which the listing is typed: it ends once the term is upright
 	const TYPE_FROM = 0.02;
@@ -158,7 +158,7 @@ const words = term.map((line) =>
 	let idle = 0;
 
 	// On resize, long lines wrap differently: the listing has to be repositioned
-	window.addEventListener('resize', () => (lastTyped = -1));
+	onResize(() => (lastTyped = -1));
 
 	onProgress(scene, (p) => {
 		const typed = Math.floor(segment(p, TYPE_FROM, TYPE_TO) * total);
@@ -273,7 +273,7 @@ const words = term.map((line) =>
 		--mark: #fbe46a;
 		position: absolute;
 		top: clamp(4.5rem, 12vh, 8rem);
-		bottom: clamp(3.5rem, 12vh, 8rem);
+		bottom: calc(clamp(3.5rem, 12vh, 8rem) + var(--chrome));
 		right: var(--gutter);
 		width: min(40vw, 46rem);
 		display: grid;

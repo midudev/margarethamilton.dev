@@ -148,7 +148,7 @@ const notes = excerpts.flatMap((excerpt) =>
 
 <script>
 	import { $, $$ } from '../../scripts/dom';
-	import { onProgress, segment } from '../../scripts/scroll';
+	import { onProgress, segment, viewportHeight } from '../../scripts/scroll';
 
 	const scene = $('[data-scene="codigo"]')!;
 	const paper = $('[data-paper]', scene)!;
@@ -160,7 +160,7 @@ const notes = excerpts.flatMap((excerpt) =>
 	}));
 
 	onProgress(scene, (p) => {
-		const vh = window.innerHeight;
+		const vh = viewportHeight();
 		const readLine = vh * 0.42;
 		const start = vh * 0.92;
 		const end = -paper.offsetHeight - vh * 0.05;
@@ -520,7 +520,7 @@ const notes = excerpts.flatMap((excerpt) =>
 			left: 0;
 			right: 0;
 			justify-items: stretch;
-			padding: 1.25rem var(--gutter) 4rem;
+			padding: 1.25rem var(--gutter) calc(4rem + var(--chrome));
 			background: var(--bg);
 			box-shadow: 0 -1px 0 rgb(0 0 0 / 0.1);
 			translate: none;
@@ -540,7 +540,7 @@ const notes = excerpts.flatMap((excerpt) =>
 			grid-template-rows: auto auto;
 			align-content: center;
 			gap: 1.5rem;
-			padding-block: 9vh 8vh;
+			padding-block: 9vh calc(8vh + var(--chrome));
 		}
 
 		.cta-text {

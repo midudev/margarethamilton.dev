@@ -1,5 +1,5 @@
 import { $, $$ } from './dom';
-import { onProgress } from './scroll';
+import { onProgress, onResize } from './scroll';
 
 /**
  * Starry sky whose stars turn into letters.
@@ -199,7 +199,7 @@ export function starfield(stage: HTMLElement, { seed = 1969, region = [0.03, 0.4
 	onProgress(scene, update);
 	document.fonts?.ready.then(invalidate);
 	let resizeTimer = 0;
-	window.addEventListener('resize', () => {
+	onResize(() => {
 		window.clearTimeout(resizeTimer);
 		resizeTimer = window.setTimeout(invalidate, 150);
 	});

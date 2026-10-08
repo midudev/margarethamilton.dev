@@ -193,6 +193,9 @@ const jsonLd = {
 		--t-giant: clamp(3.4rem, 0.6rem + 12vw, 13rem);
 
 		--gutter: clamp(1rem, 4vw, 4rem);
+		/* Room the mobile browser toolbars take while they are visible (0 on desktop):
+		   what sits at the bottom of a stage keeps clear of them */
+		--chrome: 0px;
 		--ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 
 		--bg: var(--vacio);
@@ -315,11 +318,19 @@ const jsonLd = {
 		content-visibility: visible;
 	}
 
+	@supports (height: 1svh) {
+		:root {
+			--chrome: calc(100lvh - 100svh);
+		}
+	}
+
+	/* As tall as the viewport with the mobile toolbars hidden: when they hide or show while
+	   scrolling, the stage keeps its size instead of reflowing everything (as 100dvh would) */
 	.stage {
 		position: sticky;
 		top: 0;
 		height: 100vh;
-		height: 100dvh;
+		height: 100lvh;
 		overflow: hidden;
 	}
 

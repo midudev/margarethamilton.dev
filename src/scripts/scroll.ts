@@ -45,9 +45,22 @@ const scenes: Scene[] = $$('[data-scene]').map((el) => ({
 	height: 0,
 }));
 
+// Stages are 100lvh tall: on mobile, window.innerHeight changes while the browser toolbars
+// hide or show, but this height doesn't, so the sticky travel and the progress stay put
+const probe = document.createElement('div');
+probe.style.cssText = 'position:fixed;top:0;height:100vh;height:100lvh;visibility:hidden;pointer-events:none';
+document.body.append(probe);
+let vh = 0;
+let vw = 0;
+
+/** Height of a stage: the viewport with the mobile toolbars hidden */
+export const viewportHeight = () => vh;
+
 // Scene heights only depend on the viewport, so their positions are measured once per resize
 // instead of reading the layout on every frame
 function measure() {
+	vh = probe.offsetHeight;
+	vw = window.innerWidth;
 	for (const scene of scenes) {
 		scene.top = scene.el.offsetTop;
 		scene.height = scene.el.offsetHeight;
@@ -77,7 +90,6 @@ function queue() {
 
 function frame() {
 	scheduled = false;
-	const vh = window.innerHeight;
 	const y = window.scrollY;
 	let active: Scene | undefined;
 
@@ -140,11 +152,20 @@ function setYear(year: number) {
 	step();
 }
 
+const resizeListeners: (() => void)[] = [];
+
+/** Runs `fn` when the layout viewport really changes, not when the mobile toolbars hide or show */
+export function onResize(fn: () => void) {
+	resizeListeners.push(fn);
+}
+
 window.addEventListener('scroll', queue, { passive: true });
 window.addEventListener('resize', () => {
+	if (window.innerWidth === vw && probe.offsetHeight === vh) return;
 	measure();
 	for (const scene of scenes) scene.p = -1;
 	queue();
+	for (const fn of resizeListeners) fn();
 });
 measure();
 frame();

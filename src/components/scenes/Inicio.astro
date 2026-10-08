@@ -138,7 +138,7 @@ const [born, died] = t({
 		position: absolute;
 		left: var(--gutter);
 		right: var(--gutter);
-		bottom: clamp(3rem, 9vh, 6rem);
+		bottom: calc(clamp(3rem, 9vh, 6rem) + var(--chrome));
 		display: grid;
 		grid-template-columns: 1fr auto;
 		grid-template-areas:
@@ -226,7 +226,7 @@ const [born, died] = t({
 	.hint {
 		position: absolute;
 		right: var(--gutter);
-		bottom: clamp(3rem, 9vh, 6rem);
+		bottom: calc(clamp(3rem, 9vh, 6rem) + var(--chrome));
 		width: 1px;
 		height: 4.5rem;
 		background: rgb(255 255 255 / 0.18);
@@ -254,7 +254,7 @@ const [born, died] = t({
 		position: absolute;
 		left: var(--gutter);
 		right: var(--gutter);
-		bottom: clamp(3rem, 9vh, 6rem);
+		bottom: calc(clamp(3rem, 9vh, 6rem) + var(--chrome));
 		display: flex;
 		align-items: center;
 		justify-content: center;

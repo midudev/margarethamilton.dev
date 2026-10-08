@@ -526,7 +526,7 @@ const icons: Record<string, string> = {
 
 <script>
 	import { $, $$ } from '../../scripts/dom';
-	import { onProgress } from '../../scripts/scroll';
+	import { onProgress, onResize } from '../../scripts/scroll';
 
 	// The profile scrolls by itself to the latest change
 	const scene = $('[data-scene="legado"]')!;
@@ -561,7 +561,7 @@ const icons: Record<string, string> = {
 	page.addEventListener('transitionend', (event) => {
 		if (event.propertyName === 'grid-template-rows') pan();
 	});
-	window.addEventListener('resize', pan);
+	onResize(pan);
 </script>
 
 <style>
@@ -1117,7 +1117,7 @@ const icons: Record<string, string> = {
 		inset: 0;
 		align-items: end;
 		justify-items: center;
-		padding-bottom: clamp(3.5rem, 12vh, 8rem);
+		padding-bottom: calc(clamp(3.5rem, 12vh, 8rem) + var(--chrome));
 		pointer-events: none;
 	}
 
@@ -1164,7 +1164,7 @@ const icons: Record<string, string> = {
 
 		.text {
 			justify-items: start;
-			padding-bottom: clamp(2.75rem, 9vh, 5rem);
+			padding-bottom: calc(clamp(2.75rem, 9vh, 5rem) + var(--chrome));
 		}
 
 		.text > p,

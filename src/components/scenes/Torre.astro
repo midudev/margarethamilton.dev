@@ -123,13 +123,13 @@ const slabs = binders.map((name, i) => ({
 		grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
 		align-items: center;
 		gap: clamp(1.5rem, 5vw, 6rem);
-		padding: 6vh var(--gutter);
+		padding: 6vh var(--gutter) calc(6vh + var(--chrome));
 	}
 
 	.visual {
 		position: relative;
 		height: 88vh;
-		height: 88dvh;
+		height: 88svh;
 		display: grid;
 		place-items: end center;
 	}
@@ -233,13 +233,13 @@ const slabs = binders.map((name, i) => ({
 		.stage {
 			grid-template-columns: 1fr;
 			grid-template-rows: 1fr auto;
-			padding-block: 4vh 9vh;
+			padding-block: 4vh calc(9vh + var(--chrome));
 			gap: 3vh;
 		}
 
 		.visual {
 			height: 62vh;
-			height: 62dvh;
+			height: 62svh;
 		}
 
 		.text p {
