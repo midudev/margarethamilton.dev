@@ -1,0 +1,350 @@
+---
+/**
+ * DSKY: el teclado y pantalla del Apollo Guidance Computer.
+ * Los dígitos son segmentos electroluminiscentes; se controlan desde
+ * src/scripts/dsky.ts cambiando data-d (dígito) y data-s (signo).
+ */
+interface Props {
+	id: string;
+	prog?: string;
+	verb?: string;
+	noun?: string;
+	r1?: string;
+	r2?: string;
+	r3?: string;
+	class?: string;
+}
+
+const { id, prog = '', verb = '', noun = '', r1 = '', r2 = '', r3 = '', class: className } = Astro.props;
+
+const t = 1.1;
+const h = (x1: number, x2: number, y: number) =>
+	`${x1},${y} ${x1 + t},${y - t} ${x2 - t},${y - t} ${x2},${y} ${x2 - t},${y + t} ${x1 + t},${y + t}`;
+const v = (x: number, y1: number, y2: number) =>
+	`${x},${y1} ${x + t},${y1 + t} ${x + t},${y2 - t} ${x},${y2} ${x - t},${y2 - t} ${x - t},${y1 + t}`;
+
+const segments = {
+	a: h(2.6, 11.4, 2),
+	b: v(12, 2.6, 11.4),
+	c: v(12, 12.6, 21.4),
+	d: h(2.6, 11.4, 22),
+	e: v(2, 12.6, 21.4),
+	f: v(2, 2.6, 11.4),
+	g: h(2.6, 11.4, 12),
+};
+
+const digitSvg = `<svg viewBox="0 0 14 24">${Object.entries(segments)
+	.map(([k, points]) => `<polygon class="s-${k}" points="${points}"/>`)
+	.join('')}</svg>`;
+const signSvg = `<svg viewBox="0 0 14 24"><polygon class="s-h" points="${h(1, 13, 12)}"/><polygon class="s-v" points="${v(7, 6, 18)}"/></svg>`;
+
+/** Rellena por la izquierda con espacios: un espacio es un dígito apagado */
+const digits = (value: string, n: number) => value.padStart(n, ' ').slice(-n).split('');
+
+const register = (value: string) => {
+	const sign = /^[+-]/.test(value) ? value[0] : '';
+	return { sign, digits: digits(value.replace(/^[+-]/, ''), 5) };
+};
+
+const registers = { r1: register(r1), r2: register(r2), r3: register(r3) };
+
+const lamps = [
+	['UPLINK ACTY', 'TEMP'],
+	['NO ATT', 'GIMBAL LOCK'],
+	['STBY', 'PROG'],
+	['KEY REL', 'RESTART'],
+	['OPR ERR', 'TRACKER'],
+	['', 'ALT'],
+	['', 'VEL'],
+].flat();
+
+const keys = [
+	{ k: 'VERB', area: '2 / 1 / 4 / 2' },
+	{ k: 'NOUN', area: '4 / 1 / 6 / 2' },
+	{ k: '+', area: '1 / 2 / 3 / 3' },
+	{ k: '−', area: '3 / 2 / 5 / 3' },
+	{ k: '0', area: '5 / 2 / 7 / 3' },
+	{ k: '7', area: '1 / 3 / 3 / 4' },
+	{ k: '4', area: '3 / 3 / 5 / 4' },
+	{ k: '1', area: '5 / 3 / 7 / 4' },
+	{ k: '8', area: '1 / 4 / 3 / 5' },
+	{ k: '5', area: '3 / 4 / 5 / 5' },
+	{ k: '2', area: '5 / 4 / 7 / 5' },
+	{ k: '9', area: '1 / 5 / 3 / 6' },
+	{ k: '6', area: '3 / 5 / 5 / 6' },
+	{ k: '3', area: '5 / 5 / 7 / 6' },
+	{ k: 'CLR', area: '1 / 6 / 3 / 7' },
+	{ k: 'PRO', area: '3 / 6 / 5 / 7' },
+	{ k: 'KEY REL', area: '5 / 6 / 7 / 7' },
+	{ k: 'ENTR', area: '2 / 7 / 4 / 8' },
+	{ k: 'RSET', area: '4 / 7 / 6 / 8' },
+];
+---
+
+<div class:list={['dsky', className]} id={id} aria-hidden="true">
+	<div class="face">
+		<div class="dsky-top">
+			<div class="lamps">
+				{lamps.map((lamp) => <span class="lamp" data-lamp={lamp || undefined}>{lamp}</span>)}
+			</div>
+
+			<div class="el">
+				<div class="el-row">
+					<span class="el-label acty" data-acty>COMP<br />ACTY</span>
+					<div class="el-field">
+						<span class="el-label">PROG</span>
+						<span class="digits" data-field="prog">
+							{digits(prog, 2).map((d) => <span class="d" data-d={d} set:html={digitSvg} />)}
+						</span>
+					</div>
+				</div>
+				<div class="el-row">
+					<div class="el-field">
+						<span class="el-label">VERB</span>
+						<span class="digits" data-field="verb">
+							{digits(verb, 2).map((d) => <span class="d" data-d={d} set:html={digitSvg} />)}
+						</span>
+					</div>
+					<div class="el-field">
+						<span class="el-label">NOUN</span>
+						<span class="digits" data-field="noun">
+							{digits(noun, 2).map((d) => <span class="d" data-d={d} set:html={digitSvg} />)}
+						</span>
+					</div>
+				</div>
+				{
+					Object.entries(registers).map(([name, reg]) => (
+						<div class="el-register">
+							<span class="digits" data-field={name}>
+								<span class="d sign" data-s={reg.sign} set:html={signSvg} />
+								{reg.digits.map((d) => (
+									<span class="d" data-d={d} set:html={digitSvg} />
+								))}
+							</span>
+						</div>
+					))
+				}
+			</div>
+		</div>
+
+		<div class="keys">
+			{
+				keys.map(({ k, area }) => (
+					<span class="key" data-key={k} style={`grid-area: ${area}`}>
+						{k}
+					</span>
+				))
+			}
+		</div>
+	</div>
+</div>
+
+<style>
+	.dsky {
+		--face: #a9adab;
+		--face-dark: #6d7271;
+		--glass: #0d1310;
+		container-type: inline-size;
+		width: 100%;
+	}
+
+	.face {
+		padding: 4cqw;
+		background: linear-gradient(180deg, #b7bbb9, var(--face));
+		border-radius: 1.6cqw;
+		box-shadow:
+			inset 0 0 0 0.4cqw rgb(255 255 255 / 0.25),
+			0 3cqw 8cqw rgb(0 0 0 / 0.45);
+		font-family: var(--font-sans);
+		font-weight: 500;
+		user-select: none;
+	}
+
+	.dsky-top {
+		display: grid;
+		grid-template-columns: 1fr 1.15fr;
+		gap: 3cqw;
+		padding: 2.4cqw;
+		background: var(--face-dark);
+		border-radius: 0.8cqw;
+	}
+
+	.lamps {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.2cqw;
+		align-content: start;
+	}
+
+	.lamp {
+		display: grid;
+		place-items: center;
+		min-height: 7.6cqw;
+		padding: 0.6cqw;
+		background: #c9ccc6;
+		color: #3a3d3b;
+		border-radius: 0.4cqw;
+		font-size: 2.15cqw;
+		line-height: 1.05;
+		letter-spacing: 0.04em;
+		text-align: center;
+		box-shadow: inset 0 -0.4cqw 0 rgb(0 0 0 / 0.12);
+		transition:
+			background-color 0.15s,
+			color 0.15s,
+			box-shadow 0.15s;
+	}
+
+	.lamp:not([data-lamp]) {
+		visibility: hidden;
+	}
+
+	.lamp.is-lit {
+		background: #ffd36a;
+		color: #2a1c00;
+		box-shadow:
+			0 0 3cqw rgb(255 196 64 / 0.7),
+			inset 0 0 1.5cqw rgb(255 255 255 / 0.6);
+	}
+
+	.lamp.is-lit[data-lamp='UPLINK ACTY'],
+	.lamp.is-lit[data-lamp='KEY REL'],
+	.lamp.is-lit[data-lamp='OPR ERR'],
+	.lamp.is-lit[data-lamp='STBY'],
+	.lamp.is-lit[data-lamp='NO ATT'] {
+		background: #fafaf2;
+		box-shadow: 0 0 3cqw rgb(255 255 240 / 0.6);
+	}
+
+	.el {
+		display: grid;
+		gap: 1.6cqw;
+		align-content: start;
+		padding: 2.4cqw;
+		background: var(--glass);
+		border-radius: 0.6cqw;
+		box-shadow: inset 0 0 2cqw rgb(0 0 0 / 0.9);
+		filter: drop-shadow(0 0 0.8cqw rgb(108 245 154 / 0.35));
+	}
+
+	.el-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+	}
+
+	.el-field {
+		display: grid;
+		justify-items: end;
+		gap: 0.8cqw;
+	}
+
+	.el-label {
+		padding: 0.5cqw 1cqw;
+		background: var(--el);
+		color: var(--glass);
+		font-size: 2.2cqw;
+		line-height: 1.1;
+		letter-spacing: 0.05em;
+		border-radius: 0.3cqw;
+	}
+
+	.acty {
+		align-self: start;
+		background: rgb(108 245 154 / 0.08);
+		color: transparent;
+		transition: background-color 0.08s;
+	}
+
+	.acty.is-lit {
+		background: var(--el);
+		color: var(--glass);
+	}
+
+	.el-register {
+		display: flex;
+		justify-content: flex-end;
+		padding-top: 1.4cqw;
+		border-top: 0.35cqw solid rgb(108 245 154 / 0.85);
+	}
+
+	.digits {
+		display: flex;
+		gap: 0.7cqw;
+	}
+
+	.d {
+		width: 4.1cqw;
+	}
+
+	.d :global(polygon) {
+		fill: var(--el);
+		opacity: 0.06;
+		transition: opacity 0.06s;
+	}
+
+	.d[data-d='0'] :global(:is(.s-a, .s-b, .s-c, .s-d, .s-e, .s-f)),
+	.d[data-d='1'] :global(:is(.s-b, .s-c)),
+	.d[data-d='2'] :global(:is(.s-a, .s-b, .s-g, .s-e, .s-d)),
+	.d[data-d='3'] :global(:is(.s-a, .s-b, .s-g, .s-c, .s-d)),
+	.d[data-d='4'] :global(:is(.s-f, .s-g, .s-b, .s-c)),
+	.d[data-d='5'] :global(:is(.s-a, .s-f, .s-g, .s-c, .s-d)),
+	.d[data-d='6'] :global(:is(.s-a, .s-f, .s-g, .s-e, .s-c, .s-d)),
+	.d[data-d='7'] :global(:is(.s-a, .s-b, .s-c)),
+	.d[data-d='8'] :global(polygon),
+	.d[data-d='9'] :global(:is(.s-a, .s-b, .s-c, .s-d, .s-f, .s-g)),
+	.sign[data-s='+'] :global(polygon),
+	.sign[data-s='-'] :global(.s-h) {
+		opacity: 1;
+	}
+
+	.keys {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		grid-template-rows: repeat(6, 5.6cqw);
+		gap: 1.4cqw;
+		margin-top: 4cqw;
+		padding: 2cqw;
+		background: var(--face-dark);
+		border-radius: 0.8cqw;
+	}
+
+	.key {
+		display: grid;
+		place-items: center;
+		background: radial-gradient(circle at 50% 35%, #34383a, #141617 75%);
+		color: #f0f0ea;
+		border-radius: 0.8cqw;
+		font-size: 2.6cqw;
+		line-height: 1;
+		text-align: center;
+		box-shadow:
+			inset 0 0.3cqw 0 rgb(255 255 255 / 0.12),
+			0 0.6cqw 0 #0a0b0b;
+		transition:
+			transform 0.08s,
+			box-shadow 0.08s;
+	}
+
+	.key[data-key='+'],
+	.key[data-key='−'],
+	.key[data-key='0'],
+	.key[data-key='1'],
+	.key[data-key='2'],
+	.key[data-key='3'],
+	.key[data-key='4'],
+	.key[data-key='5'],
+	.key[data-key='6'],
+	.key[data-key='7'],
+	.key[data-key='8'],
+	.key[data-key='9'] {
+		font-size: 4.2cqw;
+	}
+
+	.key.is-pressed {
+		transform: translateY(0.5cqw);
+		box-shadow:
+			inset 0 0.3cqw 0 rgb(255 255 255 / 0.12),
+			0 0.1cqw 0 #0a0b0b;
+	}
+</style>
