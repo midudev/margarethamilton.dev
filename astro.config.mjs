@@ -11,7 +11,7 @@ export default defineConfig({
 	},
 	fonts: [
 		{
-			// Revival de Futura: la tipografía de la placa que el Apollo 11 dejó en la Luna
+			// A Futura revival: the typeface on the plaque Apollo 11 left on the Moon
 			provider: fontProviders.google(),
 			name: 'Jost',
 			cssVariable: '--font-jost',

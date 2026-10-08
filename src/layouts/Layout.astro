@@ -61,8 +61,8 @@ const jsonLd = {
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<script is:inline>
-			// Primera visita: muestra el idioma del navegador (el mismo que envía en Accept-Language).
-			// Después, manda la elección guardada con el selector.
+			// First visit: show the browser's language (the same one it sends in Accept-Language).
+			// After that, the choice saved with the switcher wins.
 			(() => {
 				const root = document.documentElement;
 				root.classList.add('js');
@@ -149,7 +149,7 @@ const jsonLd = {
 	import { $$ } from '../scripts/dom';
 	import '../scripts/scroll';
 
-	// Al cambiar de idioma, guarda la elección y conserva el punto de la historia
+	// When switching language, save the choice and keep the place in the story
 	for (const link of $$<HTMLAnchorElement>('[data-lang]')) {
 		link.addEventListener('click', () => {
 			try {
@@ -170,7 +170,7 @@ const jsonLd = {
 
 <style is:global>
 	:root {
-		/* Materiales de la historia */
+		/* Materials of the story */
 		--vacio: #000000;
 		--luz: #ecece6;
 		--regolito: #8e8b84;
@@ -297,7 +297,7 @@ const jsonLd = {
 		letter-spacing: 0.01em;
 	}
 
-	/* Escena: un contenedor alto (--len, en altos de pantalla) con un escenario fijo */
+	/* Scene: a tall container (--len, in viewport heights) with a sticky stage */
 	.scene {
 		position: relative;
 		height: calc(var(--len, 300) * 1vh);
@@ -311,19 +311,19 @@ const jsonLd = {
 		overflow: hidden;
 	}
 
-	/* Antes de que llegue el JS, cada escena está en su estado inicial */
+	/* Before the JS arrives, every scene is in its initial state */
 	.js .scene {
 		--p: 0;
 	}
 
-	/* Las estrellas no se muestran hasta estar repartidas por el cielo */
+	/* Stars stay hidden until they are scattered across the sky */
 	@media (prefers-reduced-motion: no-preference) {
 		.js [data-sky]:not(.is-placed) {
 			visibility: hidden;
 		}
 	}
 
-	/* Textos que se encienden en su momento, apilados en la misma celda */
+	/* Texts that light up at their moment, stacked in the same cell */
 	.js .stack {
 		display: grid;
 	}
@@ -346,7 +346,7 @@ const jsonLd = {
 			visibility 0s;
 	}
 
-	/* Capas a pantalla completa que aparecen en --a y desaparecen en --b */
+	/* Full-screen layers that appear at --a and disappear at --b */
 	.layer {
 		--in: clamp(0, calc((var(--p, 1) - var(--a, -1)) / 0.025), 1);
 		--out: clamp(0, calc((var(--p, 1) - var(--b, 2)) / 0.025), 1);
@@ -361,7 +361,7 @@ const jsonLd = {
 		object-fit: cover;
 	}
 
-	/* Sin JavaScript, la historia se lee de arriba abajo */
+	/* Without JavaScript, the story reads from top to bottom */
 	html:not(.js) .scene {
 		height: auto;
 	}

@@ -6,7 +6,7 @@ import { getLang, translator } from '../../i18n';
 
 const t = translator(getLang(Astro));
 
-// Módulos reales de Luminary 099 y Comanche 055, de abajo arriba
+// Real modules from Luminary 099 and Comanche 055, bottom to top
 const binders = [
 	'EXECUTIVE',
 	'WAITLIST',
@@ -135,7 +135,7 @@ const slabs = binders.map((name, i) => ({
 		place-items: end center;
 	}
 
-	/* La torre se levanta listado a listado */
+	/* The tower rises listing by listing */
 	.tower {
 		display: flex;
 		flex-direction: column-reverse;
@@ -184,7 +184,7 @@ const slabs = binders.map((name, i) => ({
 		opacity: clamp(0, (var(--p, 1) - 0.4) / 0.02, 1);
 	}
 
-	/* Zoom con el scroll: primero la torre, después ella */
+	/* Scroll zoom: first the tower, then her */
 	.zoom {
 		--z1: clamp(0, (var(--p, 1) - 0.56) / 0.1, 1);
 		--z2: clamp(0, (var(--p, 1) - 0.86) / 0.08, 1);
@@ -194,7 +194,7 @@ const slabs = binders.map((name, i) => ({
 		will-change: transform;
 	}
 
-	/* La foto se revela como en el cuarto oscuro */
+	/* The photo develops as in a darkroom */
 	.zoom img {
 		--dev: clamp(0, (var(--p, 1) - 0.4) / 0.08, 1);
 		height: 100%;

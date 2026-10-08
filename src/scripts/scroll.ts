@@ -1,8 +1,8 @@
 /**
- * Motor de escenas: cada [data-scene] es un contenedor alto con un escenario sticky.
- * Calcula el progreso del scroll (0 → 1) de cada escena, lo expone como `--p`,
- * enciende los textos ([data-beat="desde hasta"]) en su momento y actualiza
- * el tema de color y el año de la página según la escena activa.
+ * Scene engine: each [data-scene] is a tall container with a sticky stage.
+ * It computes each scene's scroll progress (0 → 1), exposes it as `--p`,
+ * turns texts on ([data-beat="from to"]) at their moment and updates
+ * the page's color theme and year according to the active scene.
  */
 
 import { $, $$ } from './dom';
@@ -26,7 +26,7 @@ export const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 
 export const clamp = (n: number, min = 0, max = 1) => Math.min(max, Math.max(min, n));
 
-/** Progreso local de `p` dentro del tramo [from, to], de 0 a 1 */
+/** Local progress of `p` within the range [from, to], from 0 to 1 */
 export const segment = (p: number, from: number, to: number) => clamp((p - from) / (to - from));
 
 const scenes: Scene[] = $$('[data-scene]').map((el) => ({
@@ -85,7 +85,7 @@ function frame() {
 	if (active) applyChrome(active);
 }
 
-/** El tema y el año los marca el último texto que ya ha empezado, o la propia escena */
+/** The theme and year are set by the last text that has already started, or by the scene itself */
 function applyChrome(scene: Scene) {
 	let theme = scene.el.dataset.theme;
 	let year = scene.el.dataset.year;

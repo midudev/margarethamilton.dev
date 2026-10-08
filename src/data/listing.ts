@@ -1,14 +1,14 @@
 /**
- * Fragmentos reales de Luminary 099, el software del módulo lunar del Apollo 11,
- * tal y como están en https://github.com/chrislgarry/Apollo-11.
- * Cada línea conserva su número en el fichero original.
+ * Real excerpts from Luminary 099, the Apollo 11 lunar module software,
+ * as they appear in https://github.com/chrislgarry/Apollo-11.
+ * Each line keeps its number from the original file.
  */
 
 import type { Lang } from '../i18n';
 
 const REPO = 'https://github.com/chrislgarry/Apollo-11/blob/master/Luminary099';
 
-/** Columnas del listado: etiqueta, instrucción, operando y comentario */
+/** Listing columns: label, instruction, operand and comment */
 const row = (label: string, op: string, operand = '', comment = '') =>
 	(label.padEnd(12) + op.padEnd(8) + operand.padEnd(16) + comment).trimEnd();
 

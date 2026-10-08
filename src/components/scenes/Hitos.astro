@@ -3,8 +3,8 @@ import Stickers from '../Stickers.astro';
 import { getLang, translator } from '../../i18n';
 
 /**
- * Los primeros años, perforados en tarjetas de 80 columnas como las que
- * usaban en el MIT: cada carácter se codifica en código Hollerith.
+ * The early years, punched into 80-column cards like the ones
+ * used at MIT: each character is encoded in Hollerith code.
  */
 const t = translator(getLang(Astro));
 
@@ -83,7 +83,7 @@ const cards = milestones.map((m) => ({
 const N = cards.length;
 const SCALE = 6.4;
 const OFFSET = 0.25;
-// Cada recuerdo cae justo cuando aparece su hito
+// Each keepsake drops just as its milestone appears
 const stickerAt = milestones.map((_, i) => Math.max(0.015, (i + 0.2 - OFFSET) / SCALE + 0.005));
 
 const beat = (i: number) =>
@@ -139,7 +139,7 @@ const beat = (i: number) =>
 
 <style>
 	.stage {
-		/* Las tarjetas dejan sitio a los lados para el collage de pegatinas */
+		/* The cards leave room on the sides for the sticker collage */
 		--deck-w: min(100%, 56vw, 820px);
 		display: grid;
 		grid-template-rows: 1fr auto;
@@ -224,7 +224,7 @@ const beat = (i: number) =>
 		text-wrap: pretty;
 	}
 
-	/* En móvil: pegatinas arriba, tarjetas, más pegatinas y el texto abajo */
+	/* On mobile: stickers on top, cards, more stickers and the text at the bottom */
 	@media (max-width: 760px) {
 		.stage {
 			--deck-w: 100%;

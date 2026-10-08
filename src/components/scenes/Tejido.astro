@@ -7,12 +7,12 @@ import { getLang, translator } from '../../i18n';
 const lang = getLang(Astro);
 const t = translator(lang);
 
-// El programa vivía en seis módulos de memoria de cuerda que se encajaban en el ordenador
+// The program lived in six core rope memory modules that plugged into the computer
 const SLOT = 84;
 const TRAY_X = 18;
 const modules = Array.from({ length: 6 }, (_, i) => TRAY_X + i * SLOT + 8);
 
-// 1202 (octal) en binario: un hilo que pasa por dentro (1) o por fuera (0) de cada núcleo
+// 1202 (octal) in binary: a wire that passes through (1) or around (0) each core
 const bits = '001010000010'.split('').map(Number);
 const X0 = 70;
 const STEP = 88;
@@ -33,7 +33,7 @@ cores.forEach(({ x }, i) => {
 });
 wire += ` L ${endX} ${ys[ys.length - 1]}`;
 
-// Cada núcleo es un anillo visto de canto: la mitad izquierda queda detrás del hilo y la derecha, delante
+// Each core is a ring seen edge-on: the left half sits behind the wire and the right half in front
 const arc = (x: number, back: boolean) =>
 	back
 		? `M ${x} ${CY - RY} A ${RX} ${RY} 0 0 0 ${x} ${CY + RY}`
@@ -191,7 +191,7 @@ const arc = (x: number, back: boolean) =>
 		stroke-width: 1.5;
 	}
 
-	/* Cada módulo baja hasta su ranura, uno detrás de otro */
+	/* Each module slides down into its slot, one after another */
 	.module {
 		--k: clamp(0, calc((var(--p, 1) - 0.01 - var(--i) * 0.017) / 0.035), 1);
 		--e: calc(var(--k) * var(--k) * (3 - 2 * var(--k)));
@@ -217,7 +217,7 @@ const arc = (x: number, back: boolean) =>
 		fill: url(#tejido-cores);
 	}
 
-	/* «Se tejía»: el cobre de dentro se enciende */
+	/* “It was woven”: the copper inside lights up */
 	#tejido-cores circle {
 		fill: none;
 		stroke: var(--hilo);
@@ -248,7 +248,7 @@ const arc = (x: number, back: boolean) =>
 		box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
 	}
 
-	/* El fondo azul de estudio, llevado al tono cobre de la escena */
+	/* The blue studio background, shifted to the scene's copper tone */
 	.sealed img {
 		filter: sepia(0.6) saturate(0.85);
 	}

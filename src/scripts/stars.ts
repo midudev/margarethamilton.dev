@@ -1,11 +1,11 @@
 import { $, $$ } from './dom';
 
 /**
- * Cielo estrellado cuyas estrellas se convierten en letras.
+ * Starry sky whose stars turn into letters.
  *
- * Reparte estrellas candidatas por el cielo de la foto (sin tapar la Tierra ni bajar
- * del horizonte), asigna a cada letra la estrella más cercana con un emparejamiento
- * óptimo (así las trayectorias no se cruzan) y pinta el resto en un canvas de fondo.
+ * Scatters candidate stars across the photo's sky (without covering the Earth or dropping
+ * below the horizon), assigns each letter its nearest star with an optimal
+ * matching (so the paths don't cross) and paints the rest on a background canvas.
  */
 
 interface Star {
@@ -15,9 +15,9 @@ interface Star {
 	tint: string;
 }
 
-// Posición de la Tierra y del horizonte en la foto AS11-44-6550 (cuadrada), en fracciones de su lado
+// Position of the Earth and the horizon in photo AS11-44-6550 (square), as fractions of its side
 const EARTH = { cx: 0.504, cy: 0.355, r: 0.0735, horizon: 0.444 };
-// object-position de la foto en las escenas: 50% 40%
+// object-position of the photo in the scenes: 50% 40%
 const PHOTO_POSITION = { x: 0.5, y: 0.4 };
 const TINTS = ['255 255 255', '255 255 255', '210 226 255', '255 240 218', '228 236 255'];
 
@@ -30,7 +30,7 @@ function random(seed: number) {
 	};
 }
 
-/** Algoritmo húngaro: para cada fila (letra), la columna (estrella) que minimiza el coste total */
+/** Hungarian algorithm: for each row (letter), the column (star) that minimizes the total cost */
 function assign(cost: number[][]): number[] {
 	const n = cost.length;
 	const m = cost[0].length;
@@ -106,8 +106,8 @@ function draw(canvas: HTMLCanvasElement, width: number, height: number, stars: S
 }
 
 /**
- * `region`: franja vertical (0–1) donde pueden estar las estrellas que forman letras.
- * `photo`: si detrás está la foto de la Tierra sobre la Luna, se evitan la Tierra y el suelo lunar.
+ * `region`: vertical band (0–1) where the stars that form letters can be.
+ * `photo`: if the Earth-over-the-Moon photo is behind, the Earth and the lunar ground are avoided.
  */
 export function starfield(stage: HTMLElement, { seed = 1969, region = [0.03, 0.45], photo = false } = {}) {
 	const sky = $('[data-sky]', stage)!;
@@ -122,7 +122,7 @@ export function starfield(stage: HTMLElement, { seed = 1969, region = [0.03, 0.4
 		let earth: { x: number; y: number; r: number } | undefined;
 
 		if (photo) {
-			// La foto es cuadrada y se recorta con object-fit: cover
+			// The photo is square and cropped with object-fit: cover
 			const side = Math.max(width, height);
 			const ox = (width - side) * PHOTO_POSITION.x;
 			const oy = (height - side) * PHOTO_POSITION.y;
@@ -140,7 +140,7 @@ export function starfield(stage: HTMLElement, { seed = 1969, region = [0.03, 0.4
 			tint: TINTS[Math.floor(rand() * TINTS.length)],
 		});
 
-		// Candidatas para las letras: el triple de letras, repartidas por el cielo
+		// Candidates for the letters: three times as many as letters, scattered across the sky
 		const candidates: Star[] = [];
 		for (let tries = 0; candidates.length < letters.length * 3 && tries < 5000; tries++) {
 			const x = width * (0.02 + rand() * 0.96);
@@ -155,7 +155,7 @@ export function starfield(stage: HTMLElement, { seed = 1969, region = [0.03, 0.4
 			const c = candidates[match[i]];
 			const dx = c.x - targets[i].x;
 			const dy = c.y - targets[i].y;
-			// Una curva leve y siempre hacia el mismo lado, para que las trayectorias no se crucen
+			// A slight curve, always to the same side, so the paths don't cross
 			const bend = 0.12;
 			letter.style.setProperty('--dx', `${dx.toFixed(1)}px`);
 			letter.style.setProperty('--dy', `${dy.toFixed(1)}px`);

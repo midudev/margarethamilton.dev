@@ -13,7 +13,7 @@ export interface DskyState {
 	lamps?: string[];
 }
 
-/** Controla un DSKY renderizado por src/components/Dsky.astro */
+/** Drives a DSKY rendered by src/components/Dsky.astro */
 export function createDsky(root: HTMLElement) {
 	const fields = new Map<Field, HTMLElement>();
 	$$('[data-field]', root).forEach((el) => fields.set(el.dataset.field as Field, el));
@@ -44,7 +44,7 @@ export function createDsky(root: HTMLElement) {
 		}
 	}
 
-	/** COMP ACTY parpadea mientras el ordenador trabaja */
+	/** COMP ACTY blinks while the computer is working */
 	function computing(on: boolean) {
 		window.clearInterval(actyTimer);
 		acty?.classList.remove('is-lit');
@@ -52,7 +52,7 @@ export function createDsky(root: HTMLElement) {
 		actyTimer = window.setInterval(() => acty?.classList.toggle('is-lit', Math.random() > 0.45), 90);
 	}
 
-	/** Pulsa una secuencia de teclas, como haría el astronauta */
+	/** Presses a sequence of keys, as the astronaut would */
 	async function press(sequence: string[], delay = 170) {
 		if (reducedMotion) return;
 		for (const k of sequence) {

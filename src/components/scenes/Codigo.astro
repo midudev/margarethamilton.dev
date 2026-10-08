@@ -20,10 +20,10 @@ try {
 		stars = new Intl.NumberFormat(lang).format(stargazers_count);
 	}
 } catch {
-	// Sin red en el build: simplemente no mostramos el número
+	// No network at build time: just don't show the number
 }
 
-// Filas destacadas en la captura del repositorio, en % del ancho y alto de la imagen
+// Rows highlighted in the repository screenshot, as % of the image width and height
 const marks = [
 	{ id: 'cm', x: 2.61, y: 15.654, w: 70.12, h: 1.577, tag: t({ es: 'Módulo de mando', en: 'Command module' }) },
 	{ id: 'lm', x: 2.61, y: 17.231, w: 70.12, h: 1.577, tag: t({ es: 'Módulo lunar', en: 'Lunar module' }) },
@@ -181,7 +181,7 @@ const notes = excerpts.flatMap((excerpt) =>
 			if (on) group.lines.forEach((line) => line.classList.add('was-hl'));
 		}
 
-		// La ventana del repositorio: primero las dos carpetas, luego baja hasta la firma de Margaret
+		// The repository window: first the two folders, then it scrolls down to Margaret's signature
 		const viewHeight = page.parentElement!.clientHeight;
 		const pageHeight = page.offsetHeight;
 		const signature = (marks.get('mh')!.offsetTop + marks.get('mh')!.offsetHeight / 2) - viewHeight * 0.5;
@@ -198,6 +198,9 @@ const notes = excerpts.flatMap((excerpt) =>
 	.stage {
 		--line: 1.6rem;
 		--notes-w: clamp(15rem, 24vw, 24rem);
+		/* The paper takes whatever the notes leave free, up to 60rem */
+		--paper-w: min(60rem, 100cqw - var(--notes-w) - 3 * var(--gutter));
+		container-type: inline-size;
 	}
 
 	.intro {
@@ -219,10 +222,10 @@ const notes = excerpts.flatMap((excerpt) =>
 		padding-left: var(--gutter);
 	}
 
-	/* Papel continuo pijama, con los agujeros de arrastre a los lados */
+	/* Continuous green-bar paper, with the tractor-feed holes on the sides */
 	.paper {
 		position: relative;
-		width: min(60rem, calc(100% - var(--notes-w) - 2 * var(--gutter)));
+		width: var(--paper-w);
 		height: max-content;
 		container-type: inline-size;
 		padding: calc(var(--line) * 2) 3rem calc(var(--line) * 4);
@@ -263,7 +266,7 @@ const notes = excerpts.flatMap((excerpt) =>
 		border-right: 0;
 	}
 
-	/* Las líneas más largas del listado (113 caracteres) caben en el ancho del papel */
+	/* The longest lines in the listing (113 characters) fit the width of the paper */
 	.sheet {
 		font-size: max(0.6rem, 1.45cqw);
 	}
@@ -311,27 +314,31 @@ const notes = excerpts.flatMap((excerpt) =>
 		color: #8a9186;
 	}
 
+	/* Notes centered in the space to the right of the paper, level with the reading line */
 	.notes {
 		position: absolute;
-		right: var(--gutter);
+		left: calc(var(--gutter) + var(--paper-w));
+		right: 0;
 		top: 42vh;
-		width: var(--notes-w);
+		justify-items: center;
 		margin: 0;
-		padding: 0;
+		padding: 0 var(--gutter);
 		list-style: none;
-		translate: 0 -0.8em;
+		translate: 0 -0.6em;
 	}
 
 	.note {
 		display: grid;
-		gap: 0.75rem;
+		gap: 1rem;
 		align-content: start;
 		justify-items: start;
+		width: min(100%, 22ch);
+		font-size: clamp(1.3rem, 0.95rem + 1.5vw, 2.25rem);
 	}
 
 	.note p {
-		font-size: clamp(1.15rem, 0.9rem + 0.8vw, 1.6rem);
-		line-height: 1.22;
+		line-height: 1.15;
+		letter-spacing: -0.01em;
 		text-wrap: pretty;
 	}
 
@@ -344,7 +351,7 @@ const notes = excerpts.flatMap((excerpt) =>
 		color: var(--fg-dim);
 	}
 
-	/* Final: el repositorio original, en una ventana que entra y se desplaza sola */
+	/* Ending: the original repository, in a window that slides in and scrolls by itself */
 	.cta {
 		position: absolute;
 		inset: 0;
@@ -512,7 +519,7 @@ const notes = excerpts.flatMap((excerpt) =>
 			bottom: 0;
 			left: 0;
 			right: 0;
-			width: auto;
+			justify-items: stretch;
 			padding: 1.25rem var(--gutter) 4rem;
 			background: var(--bg);
 			box-shadow: 0 -1px 0 rgb(0 0 0 / 0.1);
@@ -521,6 +528,11 @@ const notes = excerpts.flatMap((excerpt) =>
 
 		.notes:not(:has(.is-on)) {
 			visibility: hidden;
+		}
+
+		.note {
+			width: auto;
+			font-size: 1.25rem;
 		}
 
 		.cta {

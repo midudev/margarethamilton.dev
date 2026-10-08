@@ -7,13 +7,13 @@ import medal from '../../assets/photos/medal-of-freedom-2016.jpg';
 import { getLang, translator } from '../../i18n';
 
 /**
- * Su carrera después del Apollo, como un perfil de LinkedIn que se actualiza con el scroll:
- * puestos nuevos, una foto nueva, aptitudes validadas y premios. LinkedIn no nació hasta
- * 2003, así que es el perfil que habría tenido.
+ * Her career after Apollo, as a LinkedIn profile that updates as you scroll:
+ * new positions, a new photo, endorsed skills and awards. LinkedIn wasn't founded until
+ * 2003, so this is the profile she would have had.
  */
 const t = translator(getLang(Astro));
 
-// Momentos de la escena (progreso de 0 a 1)
+// Scene moments (progress from 0 to 1)
 const HOS = 0.1;
 const HTI = 0.24;
 const AVATAR = 0.31;
@@ -23,7 +23,7 @@ const MEDAL = 0.68;
 const PHOTO = 0.76;
 const QUOTE = 0.86;
 
-/** Valor de data-beat: «desde» o «desde hasta» */
+/** data-beat value: “from” or “from to” */
 const b = (...at: number[]) => at.map((n) => +n.toFixed(3)).join(' ');
 
 const headlines = [
@@ -169,7 +169,7 @@ const languages = [
 	{ name: t({ es: 'Ensamblador del AGC', en: 'AGC assembly' }), level: t({ es: 'Competencia bilingüe o nativa', en: 'Native or bilingual proficiency' }) },
 ];
 
-// Notificaciones que le llegan a ella; cada una suma uno a la campanita
+// Notifications she receives; each one adds one to the bell
 const toasts = [
 	{
 		from: HOS + 0.01,
@@ -428,7 +428,7 @@ const icons: Record<string, string> = {
 			</div>
 		</div>
 
-		<!-- La foto de la medalla oscurece la página -->
+		<!-- The medal photo darkens the page -->
 		<div class="layer shade" style={`--a: ${PHOTO}`} data-beat={b(PHOTO)} data-theme="space">
 			<Image
 				src={medal}
@@ -511,7 +511,7 @@ const icons: Record<string, string> = {
 	import { $, $$ } from '../../scripts/dom';
 	import { onProgress } from '../../scripts/scroll';
 
-	// El perfil se desplaza solo hasta lo último que ha cambiado
+	// The profile scrolls by itself to the latest change
 	const scene = $('[data-scene="legado"]')!;
 	const viewport = $('[data-viewport]', scene)!;
 	const page = $('[data-page]', scene)!;
@@ -525,8 +525,8 @@ const icons: Record<string, string> = {
 		if (!target) return;
 		let y = target.offsetTop - GAP;
 		if (target.dataset.pan === 'end') {
-			// Una entrada nueva puede estar aún desplegándose: cuenta lo que medirá, no lo que mide.
-			// Y que quede por encima de la notificación que la acompaña.
+			// A new entry may still be expanding: count the height it will have, not the one it has.
+			// And keep it above the notification that comes with it.
 			y += $('.row', target)!.offsetHeight + toasts.offsetHeight + GAP * 3 - viewport.clientHeight;
 		}
 		const max = page.offsetHeight - viewport.clientHeight;
@@ -540,7 +540,7 @@ const icons: Record<string, string> = {
 		pan();
 	});
 
-	// Al terminar de desplegarse una entrada, lo que hay debajo ya ha cambiado de sitio
+	// Once an entry finishes expanding, everything below it has moved
 	page.addEventListener('transitionend', (event) => {
 		if (event.propertyName === 'grid-template-rows') pan();
 	});
@@ -552,7 +552,7 @@ const icons: Record<string, string> = {
 		--card-w: min(36rem, 46vw);
 	}
 
-	/* El perfil, en una ventana de navegador con los colores de LinkedIn */
+	/* The profile, in a browser window with LinkedIn's colors */
 	.profile-layer {
 		display: grid;
 		place-items: center end;
@@ -693,7 +693,7 @@ const icons: Record<string, string> = {
 		}
 	}
 
-	/* El contador de la campanita sube con cada notificación */
+	/* The bell counter goes up with each notification */
 	.badge {
 		position: absolute;
 		top: -0.15em;
@@ -762,7 +762,7 @@ const icons: Record<string, string> = {
 		object-position: 50% 33%;
 	}
 
-	/* Foto de perfil: la de 1969 hasta que la cambia por la de 1989 */
+	/* Profile photo: the 1969 one until she swaps it for the 1989 one */
 	.avatar {
 		position: relative;
 		display: grid;
@@ -845,7 +845,7 @@ const icons: Record<string, string> = {
 		color: #fff;
 	}
 
-	/* Textos que cambian en su sitio: cabecera y fechas */
+	/* Texts that change in place: header and dates */
 	.swap {
 		position: relative;
 		display: grid;
@@ -859,7 +859,7 @@ const icons: Record<string, string> = {
 		grid-area: 1 / 1;
 	}
 
-	/* Solo ocupa sitio el texto actual; el que se va se desvanece encima */
+	/* Only the current text takes up space; the outgoing one fades out on top */
 	:global(.js) .swap > * {
 		position: absolute;
 		opacity: 0;
@@ -931,7 +931,7 @@ const icons: Record<string, string> = {
 		height: 55%;
 	}
 
-	/* Las entradas nuevas se abren hueco y se iluminan un momento */
+	/* New entries make room for themselves and light up for a moment */
 	.entry {
 		display: grid;
 		grid-template-rows: 1fr;
@@ -1065,7 +1065,7 @@ const icons: Record<string, string> = {
 		letter-spacing: -0.04em;
 	}
 
-	/* La foto de la medalla */
+	/* The medal photo */
 	.shade > img {
 		object-position: 60% 30%;
 	}

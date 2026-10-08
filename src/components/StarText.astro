@@ -1,9 +1,9 @@
 ---
 /**
- * Texto cuyas letras nacen de estrellas. Cada estrella viaja hasta su letra,
- * destella al llegar y su luz se condensa en el glifo. `start`, `spread` y `dur`
- * son tramos del progreso (0–1) de la escena; las posiciones de partida las
- * calcula src/scripts/stars.ts.
+ * Text whose letters are born from stars. Each star travels to its letter,
+ * flashes on arrival and its light condenses into the glyph. `start`, `spread` and `dur`
+ * are ranges of the scene progress (0–1); the starting positions are
+ * computed by src/scripts/stars.ts.
  */
 interface Props {
 	text: string;
@@ -46,7 +46,7 @@ const words = text.split(' ').map((word) =>
 	}
 
 	.l {
-		/* t: progreso de esta letra. m: viaje de la estrella. f: destello. g: aparición del glifo */
+		/* t: this letter's progress. m: the star's journey. f: flash. g: glyph reveal */
 		--t: clamp(0, calc((var(--p, 0) - var(--start) - var(--d) * var(--spread)) / var(--dur)), 1);
 		--m0: clamp(0, calc(var(--t) / 0.72), 1);
 		--m: calc(var(--m0) * var(--m0) * (3 - 2 * var(--m0)));
@@ -58,7 +58,7 @@ const words = text.split(' ').map((word) =>
 		display: inline-block;
 	}
 
-	/* La luz se condensa en la letra: llega desenfocada y brillante, y se asienta */
+	/* The light condenses into the letter: it arrives blurred and bright, then settles */
 	.g {
 		display: inline-block;
 		color: rgb(236 236 230 / var(--g));
@@ -69,7 +69,7 @@ const words = text.split(' ').map((word) =>
 		transform-origin: 50% 60%;
 	}
 
-	/* La estrella: un punto nítido que viaja en una curva suave y destella al llegar */
+	/* The star: a sharp point that travels along a gentle curve and flashes on arrival */
 	.l::before {
 		--size: calc((1.2 + var(--mag, 0.8) * 1.8) * 1px);
 		--arc: sin(calc(var(--m) * 180deg));

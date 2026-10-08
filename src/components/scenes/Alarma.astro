@@ -43,7 +43,7 @@ const t = translator(getLang(Astro));
 				sizes="100vw"
 			/>
 		</div>
-		<!-- Película de 16 mm de la ventana de Aldrin: el scroll la va pasando fotograma a fotograma -->
+		<!-- 16 mm film from Aldrin's window: scrolling advances it frame by frame -->
 		<div class="layer film shade" style="--a: 0.46">
 			<video
 				data-film
@@ -139,7 +139,7 @@ const t = translator(getLang(Astro));
 	onProgress(scene, (p) => {
 		const step = steps.findIndex((limit) => p < limit);
 
-		// Mientras desciende, los registros cuentan hacia abajo con el scroll
+		// While descending, the registers count down with the scroll
 		if (step <= 1 || step === 4) {
 			const t = segment(p, 0.09, 0.4);
 			dsky.show({ r1: pad(33500 - t * 26000), r2: pad(610 - t * 420, '-'), r3: pad(5740 - t * 4100) });
@@ -166,8 +166,8 @@ const t = translator(getLang(Astro));
 		}
 	});
 
-	// La película del descenso (6 fotogramas por segundo, como la original) avanza con el scroll.
-	// El viaje hacia la superficie pasa deprisa y los últimos segundos, hasta el contacto, van a cámara lenta.
+	// The descent film (6 frames per second, like the original) advances with the scroll.
+	// The trip toward the surface goes by quickly and the last seconds, until contact, play in slow motion.
 	const film = $<HTMLVideoElement>('[data-film]', scene)!;
 	const FPS = 6;
 	const reel: [progress: number, seconds: number][] = [
@@ -189,7 +189,7 @@ const t = translator(getLang(Astro));
 		return Math.floor((t0 + segment(p, p0, p1) * (t1 - t0)) * FPS);
 	};
 
-	// Un salto cada vez: si el scroll va más rápido que el decodificador, se salta directo al último fotograma pedido
+	// One seek at a time: if scrolling outpaces the decoder, it jumps straight to the last requested frame
 	const seek = () => {
 		if (seeking || film.readyState < 1) return;
 		const target = Math.min(frame, Math.floor(film.duration * FPS) - 1);
@@ -198,7 +198,7 @@ const t = translator(getLang(Astro));
 		film.currentTime = (target + 0.5) / FPS;
 	};
 
-	// Se descarga entera para que cualquier salto sea instantáneo
+	// Download it whole so any seek is instant
 	async function load() {
 		const src = film.dataset.src!;
 		try {
@@ -214,7 +214,7 @@ const t = translator(getLang(Astro));
 		seeking = false;
 		seek();
 	});
-	// iOS no pinta los saltos de un vídeo que nunca se ha reproducido
+	// iOS doesn't paint seeks in a video that has never been played
 	film.addEventListener(
 		'loadeddata',
 		() => {
@@ -245,7 +245,7 @@ const t = translator(getLang(Astro));
 		background: linear-gradient(0deg, rgb(0 0 0 / 0.78), rgb(0 0 0 / 0) 55%);
 	}
 
-	/* El cuadro llega girado 45° para que el horizonte quede plano; se acerca poco a poco mientras desciende */
+	/* The frame arrives rotated 45° so the horizon is level; it slowly zooms in while descending */
 	.film video {
 		position: absolute;
 		left: 50%;

@@ -1,7 +1,7 @@
 ---
 /**
- * Recuerdos de cada hito que caen sobre la mesa como pegatinas y se quedan,
- * formando un collage. `at` es el progreso de la escena en el que cae cada una.
+ * Keepsakes from each milestone that drop onto the table like stickers and stay there,
+ * building a collage. `at` is the scene progress at which each one drops.
  */
 import { Image } from 'astro:assets';
 import paoli from '../assets/stickers/paoli-1940.jpg';
@@ -17,7 +17,7 @@ interface Props {
 const { at } = Astro.props;
 const t = translator(getLang(Astro));
 
-// El atractor de Lorenz: las ecuaciones de las predicciones del tiempo que dibujan una mariposa
+// The Lorenz attractor: the weather-forecasting equations that draw a butterfly
 let [x, y, z] = [0.1, 0, 0];
 const points: string[] = [];
 for (let i = 0; i < 6000; i++) {
@@ -107,7 +107,7 @@ const style = (i: number) => `--r:${stickers[i].r}deg`;
 		z-index: 2;
 	}
 
-	/* Cada pegatina cae desde arriba, girando, y se asienta con un pequeño rebote */
+	/* Each sticker drops from above, spinning, and settles with a small bounce */
 	.sticker {
 		position: absolute;
 		margin: 0;
@@ -139,7 +139,7 @@ const style = (i: number) => `--r:${stickers[i].r}deg`;
 		overflow: hidden;
 	}
 
-	/* Brillo de vinilo */
+	/* Vinyl sheen */
 	.paper::after,
 	.patch::after {
 		content: '';
@@ -162,7 +162,7 @@ const style = (i: number) => `--r:${stickers[i].r}deg`;
 		line-height: 1.1;
 	}
 
-	/* Postal de Paoli con su matasellos */
+	/* Postcard from Paoli with its postmark */
 	.postcard {
 		--x: 5%;
 		--y: 14%;
@@ -208,7 +208,7 @@ const style = (i: number) => `--r:${stickers[i].r}deg`;
 		text-anchor: middle;
 	}
 
-	/* Examen multicopiado, con la tinta violeta de las copias de alcohol */
+	/* Mimeographed exam, in the purple ink of spirit duplicator copies */
 	.exam {
 		--x2: 5%;
 		--y: 8%;
@@ -256,7 +256,7 @@ const style = (i: number) => `--r:${stickers[i].r}deg`;
 		display: inline;
 	}
 
-	/* La mariposa de Lorenz, en papel milimetrado */
+	/* The Lorenz butterfly, on graph paper */
 	.lorenz {
 		--x: 8%;
 		--y: 56%;
@@ -311,7 +311,7 @@ const style = (i: number) => `--r:${stickers[i].r}deg`;
 		padding: 0.15rem 0.1rem 0.25rem;
 	}
 
-	/* Parches recortados: el borde blanco sigue la silueta */
+	/* Die-cut patches: the white border follows the outline */
 	.patch img {
 		filter: drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff);
 	}

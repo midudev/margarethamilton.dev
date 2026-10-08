@@ -1,8 +1,8 @@
 ---
 /**
- * DSKY: el teclado y pantalla del Apollo Guidance Computer.
- * Los dígitos son segmentos electroluminiscentes; se controlan desde
- * src/scripts/dsky.ts cambiando data-d (dígito) y data-s (signo).
+ * DSKY: the display and keyboard of the Apollo Guidance Computer.
+ * Digits are electroluminescent segments; they are driven from
+ * src/scripts/dsky.ts by changing data-d (digit) and data-s (sign).
  */
 interface Props {
 	id: string;
@@ -38,7 +38,7 @@ const digitSvg = `<svg viewBox="0 0 14 24">${Object.entries(segments)
 	.join('')}</svg>`;
 const signSvg = `<svg viewBox="0 0 14 24"><polygon class="s-h" points="${h(1, 13, 12)}"/><polygon class="s-v" points="${v(7, 6, 18)}"/></svg>`;
 
-/** Rellena por la izquierda con espacios: un espacio es un dígito apagado */
+/** Left-pads with spaces: a space is an unlit digit */
 const digits = (value: string, n: number) => value.padStart(n, ' ').slice(-n).split('');
 
 const register = (value: string) => {
