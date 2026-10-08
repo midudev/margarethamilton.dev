@@ -75,9 +75,9 @@ function hollerith(ch: string): string[] {
 const cards = milestones.map((m) => ({
 	...m,
 	holes: m.card.split('').flatMap((ch, col) =>
-		hollerith(ch).map((row) => ({ x: colX(col) - 2.75, y: rowY(row) - 6.25, c: col / m.card.length })),
+		hollerith(ch).map((row) => ({ x: colX(col) - 2.75, y: rowY(row) - 6.25 })),
 	),
-	printed: m.card.split('').map((ch, col) => ({ ch, x: colX(col), c: col / m.card.length })),
+	printed: m.card.split('').map((ch, col) => ({ ch, x: colX(col) })),
 }));
 
 const N = cards.length;
@@ -93,12 +93,16 @@ const beat = (i: number) =>
 ---
 
 <section class="scene hitos" data-scene="hitos" data-theme="paper" data-year="1936" style={`--len: ${N * 95}`}>
-	<div class="stage">
-		<div class="deck" style={`--scale:${SCALE};--offset:${OFFSET}`} aria-hidden="true">
+	<!-- Nothing here reads --p: the cards are driven from the script -->
+	<div class="stage still">
+		<div class="deck" data-scale={SCALE} data-offset={OFFSET} aria-hidden="true">
 			{
 				cards.map((card, i) => (
-					<svg class="card" viewBox={`0 0 ${W} ${H}`} style={`--i:${i}`}>
+					<svg class="card" viewBox={`0 0 ${W} ${H}`} data-len={card.card.length}>
 						<defs>
+							<clipPath id={`punched-${i}`}>
+								<rect class="punched" width="0" height={H} />
+							</clipPath>
 							<pattern id={`digits-${i}`} width="8.7" height={H} patternUnits="userSpaceOnUse" x={colX(0) - 4.35}>
 								{ROWS.slice(2).map((row) => (
 									<text x="4.35" y={rowY(row) + 2.6}>
@@ -109,14 +113,16 @@ const beat = (i: number) =>
 						</defs>
 						<path class="stock" d={`M16 0H${W}V${H}H0V16Z`} />
 						<rect x={colX(0) - 4.35} y="60" width={80 * 8.7} height={H - 50} fill={`url(#digits-${i})`} />
-						{card.printed.map(({ ch, x, c }) => (
-							<text class="printed" x={x} y="11" style={`--c:${c.toFixed(3)}`}>
-								{ch}
-							</text>
-						))}
-						{card.holes.map(({ x, y, c }) => (
-							<rect class="hole" x={x} y={y} width="5.5" height="12.5" style={`--c:${c.toFixed(3)}`} />
-						))}
+						<g clip-path={`url(#punched-${i})`}>
+							{card.printed.map(({ ch, x }) => (
+								<text class="printed" x={x} y="11">
+									{ch}
+								</text>
+							))}
+							{card.holes.map(({ x, y }) => (
+								<rect class="hole" x={x} y={y} width="5.5" height="12.5" />
+							))}
+						</g>
 					</svg>
 				))
 			}
@@ -137,6 +143,45 @@ const beat = (i: number) =>
 	</div>
 </section>
 
+<script>
+	import { $, $$ } from '../../scripts/dom';
+	import { clamp, onProgress } from '../../scripts/scroll';
+
+	// Cards move with an inline transform and get punched column by column by widening a clip:
+	// a single change per frame, instead of restyling every hole of every card
+	const scene = $('[data-scene="hitos"]')!;
+	const deck = $('.deck', scene)!;
+	const scale = Number(deck.dataset.scale);
+	const offset = Number(deck.dataset.offset);
+	const cards = $$<SVGSVGElement>('.card', deck).map((el) => ({
+		el,
+		punched: $<SVGRectElement>('.punched', el)!,
+		columns: Number(el.dataset.len),
+		transform: '',
+		width: '',
+	}));
+
+	onProgress(scene, (p) => {
+		const q = p * scale + offset;
+		cards.forEach((card, i) => {
+			const t = clamp(q - i);
+			const enter = clamp(t / 0.25);
+			const age = clamp(q - i - 1, 0, 6);
+			const transform = `translate(calc(${((1 - enter) * 110).toFixed(2)}vw + ${(age * -0.6).toFixed(3)}%), ${(age * -2.4).toFixed(3)}%) rotate(${((1 - enter) * 8 + age * -0.5).toFixed(3)}deg)`;
+			if (transform !== card.transform) {
+				card.transform = transform;
+				card.el.style.transform = transform;
+			}
+			// Columns are 8.7 units wide and start at 20.65, the left edge of the first one
+			const width = (20.65 + clamp((t - 0.22) / 0.6) * card.columns * 8.7).toFixed(1);
+			if (width !== card.width) {
+				card.width = width;
+				card.punched.setAttribute('width', width);
+			}
+		});
+	});
+</script>
+
 <style>
 	.stage {
 		/* The cards leave room on the sides for the sticker collage */
@@ -153,24 +198,15 @@ const beat = (i: number) =>
 		position: relative;
 		width: var(--deck-w);
 		aspect-ratio: 738 / 325;
-		--q: calc(var(--p, 1) * var(--scale) + var(--offset));
 	}
 
 	.card {
-		--t: clamp(0, calc(var(--q) - var(--i)), 1);
-		--enter: clamp(0, calc(var(--t) / 0.25), 1);
-		--punch: clamp(0, calc((var(--t) - 0.22) / 0.6), 1);
-		--age: clamp(0, calc(var(--q) - var(--i) - 1), 6);
 		position: absolute;
 		inset: 0;
 		width: 100%;
 		height: 100%;
 		overflow: visible;
-		transform: translate(
-				calc((1 - var(--enter)) * 110vw + var(--age) * -0.6%),
-				calc(var(--age) * -2.4%)
-			)
-			rotate(calc((1 - var(--enter)) * 8deg + var(--age) * -0.5deg));
+		transform: translate(110vw, 0) rotate(8deg);
 		filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.12)) drop-shadow(0 8px 18px rgb(0 0 0 / 0.08));
 		will-change: transform;
 	}
@@ -190,12 +226,10 @@ const beat = (i: number) =>
 		font-size: 9px;
 		font-weight: 500;
 		fill: #2b2a26;
-		opacity: clamp(0, calc((var(--punch) - var(--c)) * 30), 1);
 	}
 
 	.hole {
 		fill: #2a2722;
-		opacity: clamp(0, calc((var(--punch) - var(--c)) * 30), 1);
 	}
 
 	.captions {
