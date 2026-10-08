@@ -1,26 +1,435 @@
 ---
 import { Image } from 'astro:assets';
-import portrait from '../../assets/photos/margaret-1989.jpg';
+import avatar1969 from '../../assets/photos/margaret-1969-avatar.jpg';
+import avatar1989 from '../../assets/photos/margaret-1989-avatar.jpg';
+import banner from '../../assets/photos/earth-over-moon.jpg';
 import medal from '../../assets/photos/medal-of-freedom-2016.jpg';
 import { getLang, translator } from '../../i18n';
 
+/**
+ * Su carrera después del Apollo, como un perfil de LinkedIn que se actualiza con el scroll:
+ * puestos nuevos, una foto nueva, aptitudes validadas y premios. LinkedIn no nació hasta
+ * 2003, así que es el perfil que habría tenido.
+ */
 const t = translator(getLang(Astro));
+
+// Momentos de la escena (progreso de 0 a 1)
+const HOS = 0.1;
+const HTI = 0.24;
+const AVATAR = 0.31;
+const SKILLS = 0.4;
+const NASA = 0.54;
+const MEDAL = 0.68;
+const PHOTO = 0.76;
+const QUOTE = 0.86;
+
+/** Valor de data-beat: «desde» o «desde hasta» */
+const b = (...at: number[]) => at.map((n) => +n.toFixed(3)).join(' ');
+
+const headlines = [
+	{ beat: b(0, HOS), text: t({ es: 'Directora de Ingeniería de Software en el MIT · Apollo', en: 'Director of Software Engineering at MIT · Apollo' }) },
+	{ beat: b(HOS, HTI), text: t({ es: 'Cofundadora y CEO en Higher Order Software', en: 'Co-founder & CEO at Higher Order Software' }) },
+	{
+		beat: b(HTI),
+		text: t({
+			es: 'Fundadora y CEO en Hamilton Technologies · Creadora del Universal Systems Language',
+			en: 'Founder & CEO at Hamilton Technologies · Creator of the Universal Systems Language',
+		}),
+	},
+];
+
+const MIT = { text: 'MIT', bg: '#a31f34' };
+
+const experience = [
+	{
+		at: HTI,
+		logo: { text: 'HTI', bg: '#1d4f91' },
+		title: t({ es: 'Fundadora y CEO', en: 'Founder & CEO' }),
+		org: 'Hamilton Technologies, Inc.',
+		dates: [{ text: t({ es: 'mar. 1986 – actualidad', en: 'Mar 1986 – Present' }) }],
+		place: 'Cambridge, Massachusetts',
+		text: t({
+			es: 'Creé el Universal Systems Language y la suite 001: prevenir los errores antes de que existan.',
+			en: 'I created the Universal Systems Language and the 001 Tool Suite: preventing errors before they exist.',
+		}),
+	},
+	{
+		at: HOS,
+		logo: { text: 'HOS', bg: '#3b3f46' },
+		title: t({ es: 'Cofundadora y CEO', en: 'Co-founder & CEO' }),
+		org: 'Higher Order Software',
+		dates: [
+			{ beat: b(0, HTI), text: t({ es: '1976 – actualidad', en: '1976 – Present' }) },
+			{ beat: b(HTI), text: '1976 – 1984' },
+		],
+		place: 'Cambridge, Massachusetts',
+		text: t({
+			es: 'Con Saydean Zeldin, para llevar a otros proyectos lo que aprendimos en el Apollo: prevenir errores y tolerar fallos.',
+			en: 'With Saydean Zeldin, to take what Apollo taught us to other projects: preventing errors and tolerating faults.',
+		}),
+	},
+	{
+		logo: MIT,
+		title: t({ es: 'Directora de la División de Ingeniería de Software', en: 'Director, Software Engineering Division' }),
+		org: 'MIT Instrumentation Laboratory',
+		dates: [
+			{ beat: b(0, HOS), text: t({ es: '1965 – actualidad', en: '1965 – Present' }) },
+			{ beat: b(HOS), text: '1965 – 1976' },
+		],
+		place: 'Cambridge, Massachusetts',
+		text: t({
+			es: 'Software de vuelo del Apollo y del Skylab, con un equipo de más de 400 personas. Llevamos a la humanidad a la Luna.',
+			en: 'Flight software for Apollo and Skylab, with a team of over 400 people. We took humanity to the Moon.',
+		}),
+	},
+	{
+		logo: { text: 'LL', bg: '#28466e' },
+		title: t({ es: 'Programadora · Proyecto SAGE', en: 'Programmer · SAGE project' }),
+		org: 'MIT Lincoln Laboratory',
+		dates: [{ text: '1961 – 1963' }],
+		place: 'Lexington, Massachusetts',
+		text: t({
+			es: 'Me dieron el programa que nadie conseguía hacer funcionar, con los comentarios en griego y latín. Funcionó.',
+			en: 'They gave me the program nobody could get working, commented in Greek and Latin. It worked.',
+		}),
+	},
+	{
+		logo: MIT,
+		title: t({ es: 'Programadora', en: 'Programmer' }),
+		org: t({ es: 'MIT · Departamento de Meteorología', en: 'MIT · Department of Meteorology' }),
+		dates: [{ text: '1959 – 1961' }],
+		place: 'Cambridge, Massachusetts',
+		text: t({
+			es: 'Software de predicción del tiempo para Edward Lorenz. Sí, el del efecto mariposa.',
+			en: 'Weather prediction software for Edward Lorenz. Yes, the butterfly effect one.',
+		}),
+	},
+	{
+		title: t({ es: 'Profesora de Matemáticas y Francés', en: 'Math and French teacher' }),
+		org: t({ es: 'Instituto público', en: 'Public high school' }),
+		dates: [{ text: '1958' }],
+		place: 'Boston, Indiana',
+		text: t({ es: 'Boston, Indiana. El otro Boston llegaría después.', en: 'Boston, Indiana. The other Boston came later.' }),
+	},
+];
+
+const skills = [
+	{
+		name: t({ es: 'Ingeniería de software', en: 'Software engineering' }),
+		note: t({ es: 'Le puso nombre ella', en: 'She coined the term' }),
+	},
+	{
+		name: t({ es: 'Programación defensiva', en: 'Defensive programming' }),
+		faces: ['LH', 'JL'],
+		note: t({
+			es: 'Lauren Hamilton y Jim Lovell han validado esta aptitud',
+			en: 'Endorsed by Lauren Hamilton and Jim Lovell',
+		}),
+	},
+	{
+		name: t({ es: 'Gestión de prioridades en tiempo real', en: 'Real-time priority scheduling' }),
+		faces: ['NA', 'BA'],
+		note: t({
+			es: 'Neil Armstrong y Buzz Aldrin han validado esta aptitud, a 10 km de la Luna',
+			en: 'Endorsed by Neil Armstrong and Buzz Aldrin, 33,500 feet above the Moon',
+		}),
+	},
+];
+
+const awards = [
+	{
+		at: MEDAL,
+		title: t({ es: 'Medalla Presidencial de la Libertad', en: 'Presidential Medal of Freedom' }),
+		issuer: t({ es: 'Otorgado por el presidente Barack Obama · nov. 2016', en: 'Issued by President Barack Obama · Nov 2016' }),
+		text: t({ es: 'La mayor distinción civil de Estados Unidos.', en: 'The highest civilian honor in the United States.' }),
+	},
+	{
+		at: NASA,
+		title: 'NASA Exceptional Space Act Award',
+		issuer: t({ es: 'Otorgado por la NASA · 2003', en: 'Issued by NASA · 2003' }),
+		text: t({
+			es: '37.200 dólares, el premio más alto que la NASA había dado nunca a una persona.',
+			en: '$37,200, the largest award NASA had ever given to an individual.',
+		}),
+	},
+	{
+		at: HTI,
+		title: 'Augusta Ada Lovelace Award',
+		issuer: t({
+			es: 'Otorgado por la Association for Women in Computing · 1986',
+			en: 'Issued by the Association for Women in Computing · 1986',
+		}),
+		text: t({ es: 'Lleva el nombre de la primera programadora de la historia.', en: 'Named after the first programmer in history.' }),
+	},
+];
+
+const languages = [
+	{ name: t({ es: 'Inglés', en: 'English' }), level: t({ es: 'Competencia bilingüe o nativa', en: 'Native or bilingual proficiency' }) },
+	{ name: t({ es: 'Francés', en: 'French' }), level: t({ es: 'Competencia profesional completa', en: 'Full professional proficiency' }) },
+	{ name: t({ es: 'Ensamblador del AGC', en: 'AGC assembly' }), level: t({ es: 'Competencia bilingüe o nativa', en: 'Native or bilingual proficiency' }) },
+];
+
+// Notificaciones que le llegan a ella; cada una suma uno a la campanita
+const toasts = [
+	{
+		from: HOS + 0.01,
+		to: HTI - 0.02,
+		icon: 'jobs',
+		title: t({ es: '¡Enhorabuena por tu nuevo puesto!', en: 'Congrats on your new role!' }),
+		text: t({ es: 'Cofundadora y CEO en Higher Order Software', en: 'Co-founder & CEO at Higher Order Software' }),
+	},
+	{
+		from: HTI + 0.01,
+		to: AVATAR - 0.01,
+		icon: 'jobs',
+		title: t({ es: '¡Enhorabuena por tu nuevo puesto!', en: 'Congrats on your new role!' }),
+		text: t({ es: 'Fundadora y CEO en Hamilton Technologies', en: 'Founder & CEO at Hamilton Technologies' }),
+	},
+	{
+		from: AVATAR,
+		to: SKILLS - 0.02,
+		icon: 'camera',
+		title: t({ es: 'Has actualizado tu foto de perfil', en: 'You updated your profile photo' }),
+		text: t({ es: 'La anterior era de 1969', en: 'The last one was from 1969' }),
+	},
+	{
+		from: NASA + 0.04,
+		to: MEDAL - 0.01,
+		icon: 'in',
+		title: t({ es: 'Acaba de nacer LinkedIn', en: 'LinkedIn has just launched' }),
+		text: t({ es: 'Mayo de 2003. Este perfil llevaba 27 años esperando.', en: 'May 2003. This profile had been waiting 27 years.' }),
+	},
+	{
+		from: MEDAL + 0.01,
+		to: PHOTO,
+		icon: 'eye',
+		title: t({ es: 'Barack Obama ha visto tu perfil', en: 'Barack Obama viewed your profile' }),
+		text: t({ es: 'Presidente de los Estados Unidos', en: 'President of the United States' }),
+	},
+];
+const badges = toasts.map((toast, i) => b(toast.from, toasts[i + 1]?.from ?? 1.01));
+
+const icons: Record<string, string> = {
+	search: '<circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="2"/>',
+	home: '<path d="M3 11 12 3.5l9 7.5v10h-6.5v-6h-5v6H3z"/>',
+	network: '<circle cx="9" cy="7.5" r="3.5"/><path d="M2 20c0-3.9 3.1-7 7-7s7 3.1 7 7z"/><circle cx="17.5" cy="8.5" r="2.5"/><path d="M16.5 12.6A5.5 5.5 0 0 1 22.5 18H18a8.6 8.6 0 0 0-1.5-5.4z"/>',
+	jobs: '<path fill-rule="evenodd" d="M9 3.5h6A1.5 1.5 0 0 1 16.5 5v1.5H20A1.5 1.5 0 0 1 21.5 8v11a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 19V8A1.5 1.5 0 0 1 4 6.5h3.5V5A1.5 1.5 0 0 1 9 3.5zm.5 3h5V5.5h-5z"/>',
+	bell: '<path d="M12 2.5a6.5 6.5 0 0 0-6.5 6.5v4.2L3.5 16.5v1h17v-1l-2-3.3V9A6.5 6.5 0 0 0 12 2.5zM9.5 19a2.5 2.5 0 0 0 5 0z"/>',
+	camera: '<path fill-rule="evenodd" d="M8.5 4h7l1.5 2.5h3A1.5 1.5 0 0 1 21.5 8v10.5A1.5 1.5 0 0 1 20 20H4a1.5 1.5 0 0 1-1.5-1.5V8A1.5 1.5 0 0 1 4 6.5h3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>',
+	eye: '<path fill-rule="evenodd" d="M12 5c6.5 0 10 7 10 7s-3.5 7-10 7S2 12 2 12s3.5-7 10-7zm0 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><circle cx="12" cy="12" r="2"/>',
+	building: '<path d="M5 21V4.5L13 3v18zm9.5 0V9H19v12zM7.5 7v2h2V7zm0 4v2h2v-2zm0 4v2h2v-2z" fill-rule="evenodd"/>',
+	award: '<circle cx="12" cy="9" r="6"/><path d="m8 14-2 8 6-3 6 3-2-8a7.5 7.5 0 0 1-8 0z"/>',
+};
 ---
 
-<section class="scene legado" data-scene="legado" data-theme="space" data-year="1976" style="--len: 520">
+<section class="scene legado" data-scene="legado" data-theme="wall" data-year="1976" style="--len: 900">
 	<div class="stage">
-		<figure class="layer portrait" style="--a: 0.2; --b: 0.5">
-			<Image
-				src={portrait}
-				alt={t({
-					es: 'Margaret Hamilton en 1989, sentada en su despacho junto a un ordenador',
-					en: 'Margaret Hamilton in 1989, sitting in her office next to a computer',
-				})}
-				widths={[527]}
-				sizes="(max-width: 760px) 70vw, 30vw"
-			/>
-		</figure>
-		<div class="layer shade" style="--a: 0.62">
+		<div class="layer profile-layer" style={`--b: ${PHOTO + 0.03}`}>
+			<div class="window">
+				<div class="bar" aria-hidden="true">
+					<i></i><i></i><i></i>
+					<span class="url">linkedin.com/in/margarethamilton</span>
+				</div>
+
+				<div class="nav" aria-hidden="true">
+					<span class="in">in</span>
+					<span class="search"><svg viewBox="0 0 24 24" set:html={icons.search} />{t({ es: 'Buscar', en: 'Search' })}</span>
+					<span class="nav-items">
+						<span><svg viewBox="0 0 24 24" set:html={icons.home} /><small>{t({ es: 'Inicio', en: 'Home' })}</small></span>
+						<span><svg viewBox="0 0 24 24" set:html={icons.network} /><small>{t({ es: 'Mi red', en: 'My Network' })}</small></span>
+						<span><svg viewBox="0 0 24 24" set:html={icons.jobs} /><small>{t({ es: 'Empleos', en: 'Jobs' })}</small></span>
+						<span>
+							<svg viewBox="0 0 24 24" set:html={icons.bell} />
+							<small>{t({ es: 'Notificaciones', en: 'Notifications' })}</small>
+							<span class="badge">{badges.map((beat, i) => <span data-beat={beat}>{i + 1}</span>)}</span>
+						</span>
+					</span>
+				</div>
+
+				<div class="viewport" data-viewport>
+					<article
+						class="page"
+						data-page
+						aria-label={t({ es: 'El perfil de LinkedIn que habría tenido Margaret Hamilton', en: 'The LinkedIn profile Margaret Hamilton would have had' })}
+					>
+						<section class="card top" data-beat="0" data-pan="start">
+							<div class="banner">
+								<Image src={banner} alt="" widths={[640, 1280]} sizes="(max-width: 760px) 92vw, 36rem" />
+							</div>
+							<div class="avatar" data-beat={b(AVATAR)} data-pan="start">
+								<Image src={avatar1969} alt={t({ es: 'Margaret Hamilton en 1969', en: 'Margaret Hamilton in 1969' })} widths={[160, 320]} sizes="140px" />
+								<Image
+									src={avatar1989}
+									alt={t({ es: 'Margaret Hamilton en 1989', en: 'Margaret Hamilton in 1989' })}
+									widths={[160, 320]}
+									sizes="140px"
+									data-beat={b(AVATAR)}
+								/>
+							</div>
+							<div class="intro">
+								<h3 class="name">Margaret Hamilton <small>{t({ es: 'Ella', en: 'She/Her' })}</small></h3>
+								<p class="swap headline">{headlines.map(({ beat, text }) => <span data-beat={beat}>{text}</span>)}</p>
+								<p class="dim">
+									{t({ es: 'Cambridge, Massachusetts, Estados Unidos', en: 'Cambridge, Massachusetts, United States' })} ·{' '}
+									<span class="link">{t({ es: 'Información de contacto', en: 'Contact info' })}</span>
+								</p>
+								<p class="link">{t({ es: 'Más de 500 contactos', en: '500+ connections' })}</p>
+								<p class="actions" aria-hidden="true">
+									<span class="primary">{t({ es: 'Abierta a', en: 'Open to' })}</span>
+									<span>{t({ es: 'Añadir sección', en: 'Add section' })}</span>
+									<span>{t({ es: 'Más', en: 'More' })}</span>
+								</p>
+							</div>
+						</section>
+
+						<section class="card">
+							<h4>{t({ es: 'Experiencia', en: 'Experience' })}</h4>
+							<ul class="list">
+								{
+									experience.map((job) => (
+										<li class="entry" data-beat={job.at && b(job.at)} data-pan={job.at && 'end'}>
+											<div class="clip">
+												<div class="row">
+													{job.logo ? (
+														<span class="logo" style={`--bg:${job.logo.bg}`} aria-hidden="true">
+															{job.logo.text}
+														</span>
+													) : (
+														<span class="logo blank" aria-hidden="true">
+															<svg viewBox="0 0 24 24" set:html={icons.building} />
+														</span>
+													)}
+													<div>
+														<p class="title">{job.title}</p>
+														<p>{job.org}</p>
+														<p class="dim">
+															{job.dates.length > 1 ? (
+																<span class="swap">
+																	{job.dates.map(({ beat, text }) => (
+																		<span data-beat={beat}>{text}</span>
+																	))}
+																</span>
+															) : (
+																job.dates[0].text
+															)}
+														</p>
+														<p class="dim">{job.place}</p>
+														<p class="desc">{job.text}</p>
+													</div>
+												</div>
+											</div>
+										</li>
+									))
+								}
+							</ul>
+						</section>
+
+						<section class="card">
+							<h4>{t({ es: 'Educación', en: 'Education' })}</h4>
+							<div class="row">
+								<span class="logo" style="--bg:#7a1e2c" aria-hidden="true">EC</span>
+								<div>
+									<p class="title">Earlham College</p>
+									<p>
+										{
+											t({
+												es: 'Licenciatura en Matemáticas · Especialidad secundaria en Filosofía',
+												en: 'BA, Mathematics · Minor in Philosophy',
+											})
+										}
+									</p>
+									<p class="dim">1958</p>
+								</div>
+							</div>
+						</section>
+
+						<section class="card" data-beat={b(SKILLS)} data-pan="start">
+							<h4>{t({ es: 'Aptitudes', en: 'Skills' })}</h4>
+							<ul class="list">
+								{
+									skills.map((skill) => (
+										<li class="row skill">
+											<div>
+												<p class="title">{skill.name}</p>
+												<p class="endorse">
+													{skill.faces && (
+														<span class="faces" aria-hidden="true">
+															{skill.faces.map((face) => (
+																<i>{face}</i>
+															))}
+														</span>
+													)}
+													{skill.note}
+												</p>
+											</div>
+										</li>
+									))
+								}
+							</ul>
+						</section>
+
+						<section class="card" data-beat={b(NASA)} data-pan="start">
+							<h4>{t({ es: 'Reconocimientos y premios', en: 'Honors & awards' })}</h4>
+							<ul class="list">
+								{
+									awards.map((award) => (
+										<li class="entry" data-beat={b(award.at)}>
+											<div class="clip">
+												<div class="row">
+													<span class="logo blank" aria-hidden="true">
+														<svg viewBox="0 0 24 24" set:html={icons.award} />
+													</span>
+													<div>
+														<p class="title">{award.title}</p>
+														<p class="dim">{award.issuer}</p>
+														<p class="desc">{award.text}</p>
+													</div>
+												</div>
+											</div>
+										</li>
+									))
+								}
+							</ul>
+						</section>
+
+						<section class="card">
+							<h4>{t({ es: 'Idiomas', en: 'Languages' })}</h4>
+							<ul class="list">
+								{
+									languages.map((language) => (
+										<li class="row">
+											<div>
+												<p class="title">{language.name}</p>
+												<p class="dim">{language.level}</p>
+											</div>
+										</li>
+									))
+								}
+							</ul>
+						</section>
+					</article>
+				</div>
+
+				<div class="toasts" aria-hidden="true">
+					{
+						toasts.map((toast) => (
+							<div class="toast" data-beat={b(toast.from, toast.to)}>
+								<span class:list={['toast-icon', toast.icon === 'in' && 'brand']}>
+									{toast.icon === 'in' ? 'in' : <svg viewBox="0 0 24 24" set:html={icons[toast.icon]} />}
+								</span>
+								<p>
+									<strong>{toast.title}</strong>
+									{toast.text}
+								</p>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</div>
+
+		<!-- La foto de la medalla oscurece la página -->
+		<div class="layer shade" style={`--a: ${PHOTO}`} data-beat={b(PHOTO)} data-theme="space">
 			<Image
 				src={medal}
 				alt={t({
@@ -33,7 +442,15 @@ const t = translator(getLang(Astro));
 		</div>
 
 		<div class="text stack">
-			<p class="beat" data-beat="0 0.2" data-year="1976">
+			<p class="beat" data-beat={b(0, HOS)}>
+				{
+					t({
+						es: 'Si LinkedIn hubiera existido en 1976, su perfil no habría parado de cambiar.',
+						en: 'Had LinkedIn existed in 1976, her profile would never have stopped changing.',
+					})
+				}
+			</p>
+			<p class="beat" data-beat={b(HOS, HTI)} data-year="1976">
 				{
 					t({
 						es: 'Deja el MIT y funda, con Saydean Zeldin, su propia empresa: Higher Order Software.',
@@ -41,7 +458,7 @@ const t = translator(getLang(Astro));
 					})
 				}
 			</p>
-			<p class="beat" data-beat="0.2 0.4" data-year="1986">
+			<p class="beat" data-beat={b(HTI, SKILLS)} data-year="1986">
 				{
 					t({
 						es: 'Después funda Hamilton Technologies y crea el Universal Systems Language.',
@@ -49,7 +466,15 @@ const t = translator(getLang(Astro));
 					})
 				}
 			</p>
-			<p class="beat" data-beat="0.4 0.62" data-year="2003">
+			<p class="beat" data-beat={b(SKILLS, NASA)}>
+				{
+					t({
+						es: 'Sus aptitudes, validadas por quienes mejor las conocían.',
+						en: 'Her skills, endorsed by the people who knew them best.',
+					})
+				}
+			</p>
+			<p class="beat" data-beat={b(NASA, MEDAL)} data-year="2003">
 				{
 					t({
 						es: 'La NASA le concede el Exceptional Space Act Award.',
@@ -57,7 +482,7 @@ const t = translator(getLang(Astro));
 					})
 				}
 			</p>
-			<p class="beat" data-beat="0.62 0.8" data-year="2016">
+			<p class="beat" data-beat={b(MEDAL, QUOTE)} data-year="2016">
 				{
 					t({
 						es: 'Barack Obama le entrega la Medalla Presidencial de la Libertad.',
@@ -65,7 +490,7 @@ const t = translator(getLang(Astro));
 					})
 				}
 			</p>
-			<blockquote class="beat quote" data-beat="0.8">
+			<blockquote class="beat quote" data-beat={b(QUOTE)}>
 				<p>
 					{
 						t({
@@ -82,19 +507,565 @@ const t = translator(getLang(Astro));
 	</div>
 </section>
 
+<script>
+	import { $, $$ } from '../../scripts/dom';
+	import { onProgress } from '../../scripts/scroll';
+
+	// El perfil se desplaza solo hasta lo último que ha cambiado
+	const scene = $('[data-scene="legado"]')!;
+	const viewport = $('[data-viewport]', scene)!;
+	const page = $('[data-page]', scene)!;
+	const toasts = $('.toasts', scene)!;
+	const from = (el: HTMLElement) => Number(el.dataset.beat!.split(' ')[0]);
+	const stops = $$('[data-pan]', page).sort((a, z) => from(a) - from(z));
+	const GAP = 12;
+	let target: HTMLElement | undefined;
+
+	function pan() {
+		if (!target) return;
+		let y = target.offsetTop - GAP;
+		if (target.dataset.pan === 'end') {
+			// Una entrada nueva puede estar aún desplegándose: cuenta lo que medirá, no lo que mide.
+			// Y que quede por encima de la notificación que la acompaña.
+			y += $('.row', target)!.offsetHeight + toasts.offsetHeight + GAP * 3 - viewport.clientHeight;
+		}
+		const max = page.offsetHeight - viewport.clientHeight;
+		page.style.setProperty('--pan', `${-Math.round(Math.max(0, Math.min(max, y)))}px`);
+	}
+
+	onProgress(scene, () => {
+		const next = stops.filter((el) => el.classList.contains('is-on')).at(-1);
+		if (next === target) return;
+		target = next;
+		pan();
+	});
+
+	// Al terminar de desplegarse una entrada, lo que hay debajo ya ha cambiado de sitio
+	page.addEventListener('transitionend', (event) => {
+		if (event.propertyName === 'grid-template-rows') pan();
+	});
+	window.addEventListener('resize', pan);
+</script>
+
 <style>
-	.portrait {
+	.stage {
+		--card-w: min(36rem, 46vw);
+	}
+
+	/* El perfil, en una ventana de navegador con los colores de LinkedIn */
+	.profile-layer {
 		display: grid;
 		place-items: center end;
-		padding: 10vh clamp(1rem, 10vw, 12rem);
+		padding: 6vh var(--gutter);
 	}
 
-	.portrait img {
-		width: min(30vw, 46vh);
+	.window {
+		--li-bg: #f4f2ee;
+		--li-line: rgb(0 0 0 / 0.08);
+		--li-text: rgb(0 0 0 / 0.9);
+		--li-dim: rgb(0 0 0 / 0.6);
+		--li-blue: #0a66c2;
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		width: var(--card-w);
+		height: min(86vh, 50rem);
+		overflow: hidden;
+		border-radius: 12px;
+		background: var(--li-bg);
+		color: var(--li-text);
+		font-family: -apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+		font-size: clamp(11px, 0.5rem + 0.6vw, 14px);
+		line-height: 1.4;
+		letter-spacing: normal;
+		text-align: left;
+		box-shadow:
+			0 0 0 1px rgb(0 0 0 / 0.06),
+			0 30px 60px -20px rgb(0 0 0 / 0.3);
+		container-type: inline-size;
+	}
+
+	.window svg {
+		display: inline-block;
+		fill: currentColor;
+	}
+
+	.bar {
+		display: flex;
+		align-items: center;
+		gap: 0.45em;
+		padding: 0.6em 0.9em;
+		background: #e6e3dc;
+	}
+
+	.bar i {
+		width: 0.8em;
+		height: 0.8em;
+		border-radius: 50%;
+		background: rgb(0 0 0 / 0.14);
+	}
+
+	.url {
+		flex: 1;
+		margin-left: 0.6em;
+		padding: 0.2em 0.9em;
+		overflow: hidden;
+		border-radius: 999px;
+		background: #fff;
+		color: var(--li-dim);
+		font-size: 0.85em;
+		text-align: center;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.nav {
+		display: flex;
+		align-items: center;
+		gap: 0.6em;
+		padding: 0.35em 1em;
+		background: #fff;
+		border-bottom: 1px solid var(--li-line);
+	}
+
+	.in {
+		display: grid;
+		place-items: center;
+		flex: none;
+		width: 2.4em;
+		height: 2.4em;
+		border-radius: 0.3em;
+		background: var(--li-blue);
+		color: #fff;
+		font-size: 1.05em;
+		font-weight: 700;
+		letter-spacing: -0.04em;
+	}
+
+	.search {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		flex: 0 1 11em;
+		min-width: 0;
+		padding: 0.5em 0.8em;
+		border-radius: 0.3em;
+		background: #edf3f8;
+		color: var(--li-dim);
+	}
+
+	.search svg {
+		width: 1.15em;
+		height: 1.15em;
+		flex: none;
+	}
+
+	.nav-items {
+		display: flex;
+		margin-left: auto;
+	}
+
+	.nav-items > span {
+		position: relative;
+		display: grid;
+		justify-items: center;
+		min-width: 4.4em;
+		color: var(--li-dim);
+	}
+
+	.nav-items svg {
+		width: 1.75em;
+		height: 1.75em;
+	}
+
+	.nav-items small {
+		font-size: 0.8em;
+		white-space: nowrap;
+	}
+
+	@container (max-width: 34rem) {
+		.nav-items small {
+			display: none;
+		}
+
+		.nav-items > span {
+			min-width: 2.8em;
+		}
+	}
+
+	/* El contador de la campanita sube con cada notificación */
+	.badge {
+		position: absolute;
+		top: -0.15em;
+		left: 55%;
+		display: grid;
+	}
+
+	.badge > span {
+		grid-area: 1 / 1;
+		min-width: 1.55em;
+		height: 1.55em;
+		padding: 0 0.4em;
+		border-radius: 999px;
+		background: #cb112d;
+		color: #fff;
+		font-size: 0.8em;
+		font-weight: 600;
+		line-height: 1.55em;
+		text-align: center;
+		transform: scale(0);
+		transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+	}
+
+	.badge > .is-on {
+		transform: scale(1);
+	}
+
+	.viewport {
+		position: relative;
+		flex: 1;
+		overflow: hidden;
+	}
+
+	.page {
+		position: relative;
+		display: grid;
+		gap: 0.6em;
+		padding: 0.6em;
+		transform: translateY(var(--pan, 0px));
+		transition: transform 0.9s var(--ease-out);
+	}
+
+	.card {
+		padding: 1.1em 1.2em 0.3em;
+		background: #fff;
+		border-radius: 0.6em;
+		box-shadow: 0 0 0 1px var(--li-line);
+	}
+
+	.card h4 {
+		margin: 0 0 0.2em;
+		font-size: 1.45em;
+		font-weight: 600;
+	}
+
+	.top {
+		padding: 0;
+		overflow: hidden;
+	}
+
+	.banner img {
+		width: 100%;
 		height: auto;
-		filter: grayscale(0.2);
+		aspect-ratio: 4 / 1;
+		object-fit: cover;
+		object-position: 50% 33%;
 	}
 
+	/* Foto de perfil: la de 1969 hasta que la cambia por la de 1989 */
+	.avatar {
+		position: relative;
+		display: grid;
+		width: 8.5em;
+		aspect-ratio: 1;
+		margin: -4.6em 0 0 1.2em;
+		overflow: hidden;
+		border: 0.25em solid #fff;
+		border-radius: 50%;
+		background: #fff;
+	}
+
+	.avatar img {
+		grid-area: 1 / 1;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	:global(.js) .avatar img[data-beat] {
+		opacity: 0;
+		transition: opacity 0.8s ease;
+	}
+
+	:global(.js) .avatar img.is-on {
+		opacity: 1;
+	}
+
+	.intro {
+		display: grid;
+		gap: 0.3em;
+		padding: 0.6em 1.2em 1.2em;
+	}
+
+	.name {
+		margin: 0;
+		font-size: 1.75em;
+		font-weight: 600;
+		line-height: 1.2;
+	}
+
+	.name small {
+		color: var(--li-dim);
+		font-size: 0.5em;
+		font-weight: 400;
+	}
+
+	.headline {
+		font-size: 1.1em;
+		line-height: 1.35;
+		text-wrap: pretty;
+	}
+
+	.dim {
+		color: var(--li-dim);
+	}
+
+	.link {
+		color: var(--li-blue);
+		font-weight: 600;
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5em;
+		margin-top: 0.5em;
+	}
+
+	.actions span {
+		padding: 0.35em 1.1em;
+		border: 1px solid var(--li-blue);
+		border-radius: 999px;
+		color: var(--li-blue);
+		font-weight: 600;
+	}
+
+	.actions .primary {
+		background: var(--li-blue);
+		color: #fff;
+	}
+
+	/* Textos que cambian en su sitio: cabecera y fechas */
+	.swap {
+		position: relative;
+		display: grid;
+	}
+
+	.dim .swap {
+		display: inline-grid;
+	}
+
+	.swap > * {
+		grid-area: 1 / 1;
+	}
+
+	/* Solo ocupa sitio el texto actual; el que se va se desvanece encima */
+	:global(.js) .swap > * {
+		position: absolute;
+		opacity: 0;
+		visibility: hidden;
+		transition:
+			opacity 0.3s ease,
+			visibility 0s linear 0.3s;
+	}
+
+	:global(.js) .swap > .is-on {
+		position: static;
+		opacity: 1;
+		visibility: visible;
+		transition:
+			opacity 0.5s ease 0.2s,
+			visibility 0s;
+	}
+
+	.list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.row {
+		display: flex;
+		gap: 0.8em;
+		margin-inline: -0.6em;
+		padding: 0.85em 0.6em;
+		border-radius: 0.5em;
+		box-shadow: inset 0 -1px var(--li-line);
+	}
+
+	.list > :last-child .row,
+	.list > .row:last-child,
+	.card > .row {
+		box-shadow: none;
+	}
+
+	.title {
+		font-weight: 600;
+	}
+
+	.desc {
+		margin-top: 0.4em;
+		text-wrap: pretty;
+	}
+
+	.logo {
+		display: grid;
+		place-items: center;
+		flex: none;
+		width: 4.2em;
+		height: 4.2em;
+		background: var(--bg);
+		color: #fff;
+		font-size: 0.8em;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+	}
+
+	.logo.blank {
+		background: #e9e5df;
+		color: #9b958c;
+	}
+
+	.logo svg {
+		width: 55%;
+		height: 55%;
+	}
+
+	/* Las entradas nuevas se abren hueco y se iluminan un momento */
+	.entry {
+		display: grid;
+		grid-template-rows: 1fr;
+		transition:
+			grid-template-rows 0.6s var(--ease-out),
+			opacity 0.5s ease;
+	}
+
+	:global(.js) .entry[data-beat]:not(.is-on) {
+		grid-template-rows: 0fr;
+		opacity: 0;
+	}
+
+	.clip {
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	:global(.js) .entry.is-on .row,
+	:global(.js) .headline > .is-on {
+		animation: fresh 2.6s ease-out;
+	}
+
+	@keyframes fresh {
+		from,
+		25% {
+			background-color: #dbeafd;
+		}
+		to {
+			background-color: rgb(219 234 253 / 0);
+		}
+	}
+
+	.endorse {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		margin-top: 0.3em;
+		color: var(--li-dim);
+	}
+
+	.faces {
+		display: flex;
+		flex: none;
+	}
+
+	.faces i {
+		display: grid;
+		place-items: center;
+		width: 2.6em;
+		height: 2.6em;
+		border: 0.15em solid #fff;
+		border-radius: 50%;
+		background: #c9d6e4;
+		color: #33475b;
+		font-size: 0.7em;
+		font-style: normal;
+		font-weight: 600;
+	}
+
+	.faces i + i {
+		margin-left: -0.6em;
+		background: #e4d7c9;
+		color: #5b4633;
+	}
+
+	.toasts {
+		position: absolute;
+		left: 0.8em;
+		right: 0.8em;
+		bottom: 0.8em;
+		display: grid;
+		pointer-events: none;
+	}
+
+	.toast {
+		grid-area: 1 / 1;
+		display: flex;
+		align-items: center;
+		gap: 0.8em;
+		padding: 0.8em 1em;
+		background: #fff;
+		border-radius: 0.6em;
+		box-shadow:
+			0 0 0 1px var(--li-line),
+			0 12px 30px -8px rgb(0 0 0 / 0.35);
+		opacity: 0;
+		transform: translateY(130%);
+		transition:
+			transform 0.5s var(--ease-out),
+			opacity 0.3s ease;
+	}
+
+	.toast.is-on {
+		opacity: 1;
+		transform: none;
+	}
+
+	.toast p {
+		margin: 0;
+		color: var(--li-dim);
+	}
+
+	.toast strong {
+		display: block;
+		color: var(--li-text);
+		font-weight: 600;
+	}
+
+	.toast-icon {
+		display: grid;
+		place-items: center;
+		flex: none;
+		width: 2.6em;
+		height: 2.6em;
+		border-radius: 50%;
+		background: #e5f0fb;
+		color: var(--li-blue);
+	}
+
+	.toast-icon svg {
+		width: 1.35em;
+		height: 1.35em;
+	}
+
+	.toast-icon.brand {
+		border-radius: 0.4em;
+		background: var(--li-blue);
+		color: #fff;
+		font-weight: 700;
+		letter-spacing: -0.04em;
+	}
+
+	/* La foto de la medalla */
 	.shade > img {
 		object-position: 60% 30%;
 	}
@@ -109,7 +1080,7 @@ const t = translator(getLang(Astro));
 	.text {
 		position: absolute;
 		left: var(--gutter);
-		right: var(--gutter);
+		right: calc(var(--card-w) + var(--gutter) * 2);
 		bottom: clamp(3.5rem, 12vh, 8rem);
 		align-items: end;
 	}
@@ -133,16 +1104,42 @@ const t = translator(getLang(Astro));
 	}
 
 	@media (max-width: 760px) {
-		.portrait {
-			place-items: start center;
+		.stage {
+			--card-w: calc(100vw - var(--gutter) * 2);
 		}
 
-		.portrait img {
-			width: min(64vw, 40vh);
+		.profile-layer {
+			place-items: start center;
+			padding-top: 3.75rem;
+		}
+
+		.window {
+			height: 62vh;
+			height: 62svh;
+			font-size: 11.5px;
+		}
+
+		.text {
+			right: var(--gutter);
+			bottom: clamp(2.75rem, 9vh, 5rem);
 		}
 
 		.text p {
-			font-size: 1.35rem;
+			font-size: 1.3rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.page,
+		.entry,
+		.toast,
+		.badge > span {
+			transition: none;
+		}
+
+		:global(.js) .entry.is-on .row,
+		:global(.js) .headline > .is-on {
+			animation: none;
 		}
 	}
 
@@ -150,5 +1147,20 @@ const t = translator(getLang(Astro));
 	html:not(.js) .text {
 		position: relative;
 		inset: auto;
+	}
+
+	html:not(.js) .profile-layer {
+		opacity: 1;
+	}
+
+	html:not(.js) .window {
+		height: auto;
+		margin-inline: auto;
+	}
+
+	html:not(.js) .swap > :not(:last-child),
+	html:not(.js) .toasts,
+	html:not(.js) .badge {
+		display: none;
 	}
 </style>
