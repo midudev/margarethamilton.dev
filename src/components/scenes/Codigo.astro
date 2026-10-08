@@ -1,0 +1,557 @@
+---
+import { Image } from 'astro:assets';
+import githubRepo from '../../assets/photos/github-apollo-11.png';
+import { excerpts, lineHref } from '../../data/listing';
+import { getLang, translator } from '../../i18n';
+
+const lang = getLang(Astro);
+const t = translator(lang);
+
+const REPO_URL = 'https://github.com/chrislgarry/Apollo-11';
+
+let stars: string | null = null;
+try {
+	const res = await fetch('https://api.github.com/repos/chrislgarry/Apollo-11', {
+		headers: { Accept: 'application/vnd.github+json' },
+		signal: AbortSignal.timeout(4000),
+	});
+	if (res.ok) {
+		const { stargazers_count } = (await res.json()) as { stargazers_count: number };
+		stars = new Intl.NumberFormat(lang).format(stargazers_count);
+	}
+} catch {
+	// Sin red en el build: simplemente no mostramos el número
+}
+
+// Filas destacadas en la captura del repositorio, en % del ancho y alto de la imagen
+const marks = [
+	{ id: 'cm', x: 2.61, y: 15.654, w: 70.12, h: 1.577, tag: t({ es: 'Módulo de mando', en: 'Command module' }) },
+	{ id: 'lm', x: 2.61, y: 17.231, w: 70.12, h: 1.577, tag: t({ es: 'Módulo lunar', en: 'Lunar module' }) },
+	{ id: 'mh', x: 5.18, y: 90.872, w: 42.85, h: 2.346 },
+];
+
+const notes = excerpts.flatMap((excerpt) =>
+	excerpt.notes.map((note) => ({ ...note, text: note.text[lang], href: lineHref(excerpt.file, note.from, note.to) })),
+);
+---
+
+<section class="scene codigo" data-scene="codigo" data-theme="paper" data-year="1969" style="--len: 1150">
+	<div class="stage">
+		<p class="intro beat" data-beat="0 0.07">
+			{t({ es: 'El código del Apollo 11 está en GitHub. Y tiene sentido del humor.', en: 'The Apollo 11 code is on GitHub. And it has a sense of humor.' })}
+		</p>
+
+		<div class="feed">
+			<div class="paper" data-paper>
+				{
+					excerpts.map((excerpt) => (
+						<div class="sheet">
+							<p class="sheet-head">
+								<span>LUMINARY 099</span>
+								<span>{excerpt.file}</span>
+							</p>
+							{excerpt.lines.map((line) =>
+								line === 'gap' ? (
+									<span class="line gap" aria-hidden="true">
+										<span class="n" />
+										<span class="code">⋮</span>
+									</span>
+								) : (
+									<span class="line" data-hl={line.note}>
+										<span class="n">{line.n}</span>
+										<span class="code">{line.text || ' '}</span>
+									</span>
+								),
+							)}
+						</div>
+					))
+				}
+			</div>
+		</div>
+
+		<ol class="notes stack">
+			{
+				notes.map((note) => (
+					<li class="note beat" data-note={note.id}>
+						<p>{note.text}</p>
+						<a class="mono" href={note.href} target="_blank" rel="noopener">
+							{t({ es: 'Ver en GitHub', en: 'See it on GitHub' })}
+						</a>
+					</li>
+				))
+			}
+		</ol>
+
+		<div class="cta">
+			<div class="cta-text">
+				<div class="stack">
+					<p class="beat" data-beat="0.74 0.86">
+						{
+							t({
+								es: 'Lo escribieron para dos ordenadores, el del módulo de mando y el del lunar. Hoy cualquiera puede leerlo.',
+								en: 'It was written for two computers, the command module’s and the lunar module’s. Today anyone can read it.',
+							})
+						}
+					</p>
+					<p class="beat" data-beat="0.86">
+						{
+							t({
+								es: 'Y en el README, su firma: «Submitted by Margaret H. Hamilton, Colossus Programming Leader». 28 de marzo de 1969.',
+								en: 'And in the README, her signature: “Submitted by Margaret H. Hamilton, Colossus Programming Leader.” March 28, 1969.',
+							})
+						}
+					</p>
+				</div>
+				<div class="beat cta-actions" data-beat="0.74">
+					{
+						stars && (
+							<p class="mono">
+								{t({ es: `${stars} personas le han dado una estrella.`, en: `${stars} people have starred it.` })}
+							</p>
+						)
+					}
+					<a class="button" href={REPO_URL} target="_blank" rel="noopener">
+						{t({ es: 'Leer el código en GitHub', en: 'Read the code on GitHub' })}
+					</a>
+				</div>
+			</div>
+
+			<div class="browser">
+				<div class="chrome">
+					<span class="dots" aria-hidden="true"></span>
+					<a class="url" href={REPO_URL} target="_blank" rel="noopener">github.com/chrislgarry/Apollo-11</a>
+				</div>
+				<div class="viewport">
+					<div class="page" data-page>
+						<Image
+							src={githubRepo}
+							alt={t({
+								es: 'El repositorio chrislgarry/Apollo-11 en GitHub: las carpetas Comanche055 y Luminary099 y, en el README, la tabla de aprobaciones con Margaret H. Hamilton como responsable',
+								en: 'The chrislgarry/Apollo-11 repository on GitHub: the Comanche055 and Luminary099 folders and, in the README, the approvals table with Margaret H. Hamilton as submitter',
+							})}
+							widths={[640, 960, 1280]}
+							sizes="(max-width: 900px) 92vw, 46vw"
+						/>
+						{
+							marks.map(({ id, x, y, w, h, tag }) => (
+								<span class="mark" data-mark={id} style={`left:${x}%;top:${y}%;width:${w}%;height:${h}%`}>
+									{tag && <span class="tag">{tag}</span>}
+								</span>
+							))
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	import { $, $$ } from '../../scripts/dom';
+	import { onProgress, segment } from '../../scripts/scroll';
+
+	const scene = $('[data-scene="codigo"]')!;
+	const paper = $('[data-paper]', scene)!;
+	const page = $('[data-page]', scene)!;
+	const marks = new Map($$('[data-mark]', scene).map((mark) => [mark.dataset.mark!, mark]));
+	const groups = $$('[data-note]', scene).map((note) => ({
+		note,
+		lines: $$(`[data-hl="${note.dataset.note}"]`, scene),
+	}));
+
+	onProgress(scene, (p) => {
+		const vh = window.innerHeight;
+		const readLine = vh * 0.42;
+		const start = vh * 0.92;
+		const end = -paper.offsetHeight - vh * 0.05;
+		const y = start + (end - start) * segment(p, 0.03, 0.72);
+		paper.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
+
+		const read = readLine - y;
+		let active: (typeof groups)[number] | undefined;
+		for (const group of groups) {
+			const first = group.lines[0];
+			const last = group.lines[group.lines.length - 1];
+			if (first.offsetTop <= read + 24 && last.offsetTop + vh * 0.16 >= read) active = group;
+		}
+		for (const group of groups) {
+			const on = group === active;
+			group.note.classList.toggle('is-on', on);
+			group.lines.forEach((line) => line.classList.toggle('is-hl', on || line.classList.contains('was-hl')));
+			if (on) group.lines.forEach((line) => line.classList.add('was-hl'));
+		}
+
+		// La ventana del repositorio: primero las dos carpetas, luego baja hasta la firma de Margaret
+		const viewHeight = page.parentElement!.clientHeight;
+		const pageHeight = page.offsetHeight;
+		const signature = (marks.get('mh')!.offsetTop + marks.get('mh')!.offsetHeight / 2) - viewHeight * 0.5;
+		const target = Math.min(Math.max(signature, 0), pageHeight - viewHeight);
+		const s = segment(p, 0.86, 0.95);
+		page.style.transform = `translate3d(0, ${(-target * s * s * (3 - 2 * s)).toFixed(1)}px, 0)`;
+		marks.get('cm')!.classList.toggle('is-on', p >= 0.79 && p < 0.87);
+		marks.get('lm')!.classList.toggle('is-on', p >= 0.8 && p < 0.87);
+		marks.get('mh')!.classList.toggle('is-on', p >= 0.94);
+	});
+</script>
+
+<style>
+	.stage {
+		--line: 1.6rem;
+		--notes-w: clamp(15rem, 24vw, 24rem);
+	}
+
+	.intro {
+		position: absolute;
+		left: var(--gutter);
+		top: 12vh;
+		max-width: 18ch;
+		font-size: var(--t-lead);
+		line-height: 1.12;
+		letter-spacing: -0.015em;
+		z-index: 2;
+	}
+
+	.feed {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		justify-content: flex-start;
+		padding-left: var(--gutter);
+	}
+
+	/* Papel continuo pijama, con los agujeros de arrastre a los lados */
+	.paper {
+		position: relative;
+		width: min(60rem, calc(100% - var(--notes-w) - 2 * var(--gutter)));
+		height: max-content;
+		container-type: inline-size;
+		padding: calc(var(--line) * 2) 3rem calc(var(--line) * 4);
+		background:
+			radial-gradient(circle, var(--bg) 0.3rem, transparent 0.34rem) left 0.75rem top 0 / 1.5rem calc(var(--line) * 3)
+				repeat-y,
+			radial-gradient(circle, var(--bg) 0.3rem, transparent 0.34rem) right 0.75rem top 0 / 1.5rem calc(var(--line) * 3)
+				repeat-y,
+			repeating-linear-gradient(
+				180deg,
+				var(--barra-verde) 0 calc(var(--line) * 3),
+				#f6f7f1 calc(var(--line) * 3) calc(var(--line) * 6)
+			);
+		background-origin: border-box;
+		box-shadow:
+			0 0 0 1px rgb(0 0 0 / 0.04),
+			0 30px 60px rgb(0 0 0 / 0.08);
+		font-family: var(--font-mono);
+		color: #262a24;
+		will-change: transform;
+	}
+
+	.paper::before,
+	.paper::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 1.5rem;
+		border-inline: 1px dashed rgb(0 0 0 / 0.12);
+	}
+	.paper::before {
+		left: 0;
+		border-left: 0;
+	}
+	.paper::after {
+		right: 0;
+		border-right: 0;
+	}
+
+	/* Las líneas más largas del listado (113 caracteres) caben en el ancho del papel */
+	.sheet {
+		font-size: max(0.6rem, 1.45cqw);
+	}
+
+	.sheet + .sheet {
+		margin-top: calc(var(--line) * 3);
+		padding-top: calc(var(--line) * 2);
+		border-top: 1px dashed rgb(0 0 0 / 0.25);
+	}
+
+	.sheet-head {
+		display: flex;
+		justify-content: space-between;
+		gap: 2rem;
+		height: calc(var(--line) * 2);
+		color: #5d6359;
+	}
+
+	.line {
+		display: flex;
+		height: var(--line);
+		align-items: center;
+		white-space: pre;
+		overflow: hidden;
+	}
+
+	.n {
+		flex: 0 0 4ch;
+		margin-right: 2ch;
+		text-align: right;
+		color: #8a9186;
+	}
+
+	.code {
+		background: linear-gradient(#fbe46a, #fbe46a) no-repeat 0 55% / 0% 72%;
+		mix-blend-mode: multiply;
+		transition: background-size 0.7s var(--ease-out);
+	}
+
+	.line.is-hl .code {
+		background-size: 100% 72%;
+	}
+
+	.gap .code {
+		color: #8a9186;
+	}
+
+	.notes {
+		position: absolute;
+		right: var(--gutter);
+		top: 42vh;
+		width: var(--notes-w);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		translate: 0 -0.8em;
+	}
+
+	.note {
+		display: grid;
+		gap: 0.75rem;
+		align-content: start;
+		justify-items: start;
+	}
+
+	.note p {
+		font-size: clamp(1.15rem, 0.9rem + 0.8vw, 1.6rem);
+		line-height: 1.22;
+		text-wrap: pretty;
+	}
+
+	.note a,
+	.cta a {
+		pointer-events: auto;
+	}
+
+	.note .mono {
+		color: var(--fg-dim);
+	}
+
+	/* Final: el repositorio original, en una ventana que entra y se desplaza sola */
+	.cta {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+		align-items: center;
+		gap: clamp(2rem, 5vw, 6rem);
+		padding: 8vh var(--gutter);
+		pointer-events: none;
+	}
+
+	.cta-text {
+		display: grid;
+		gap: 2rem;
+		justify-items: start;
+	}
+
+	.cta-text .stack p {
+		max-width: 22ch;
+		font-size: var(--t-lead);
+		line-height: 1.1;
+		letter-spacing: -0.015em;
+		text-wrap: pretty;
+	}
+
+	.cta-actions {
+		display: grid;
+		gap: 1rem;
+		justify-items: start;
+	}
+
+	.cta-actions .mono {
+		color: var(--fg-dim);
+	}
+
+	.browser {
+		--enter: clamp(0, (var(--p, 1) - 0.73) / 0.06, 1);
+		display: grid;
+		grid-template-rows: auto 1fr;
+		height: min(76vh, 46rem);
+		overflow: hidden;
+		background: #fff;
+		border-radius: 12px;
+		box-shadow:
+			0 0 0 1px rgb(0 0 0 / 0.08),
+			0 40px 90px rgb(0 0 0 / 0.16);
+		opacity: var(--enter);
+		transform: perspective(1400px) translateY(calc((1 - var(--enter)) * var(--rise, 18vh)))
+			rotateX(calc((1 - var(--enter)) * 16deg));
+		transform-origin: 50% 100%;
+		pointer-events: auto;
+	}
+
+	.chrome {
+		display: flex;
+		align-items: center;
+		gap: 0.9rem;
+		padding: 0.6rem 0.9rem;
+		background: #eceee8;
+		border-bottom: 1px solid rgb(0 0 0 / 0.08);
+	}
+
+	.dots {
+		flex: 0 0 auto;
+		width: 0.6rem;
+		height: 0.6rem;
+		margin-right: 1.8rem;
+		border-radius: 50%;
+		background: #c8cbc4;
+		box-shadow:
+			0.9rem 0 0 #c8cbc4,
+			1.8rem 0 0 #c8cbc4;
+	}
+
+	.url {
+		flex: 1;
+		min-width: 0;
+		padding: 0.35rem 0.9rem;
+		overflow: hidden;
+		background: #fff;
+		border-radius: 999px;
+		color: #4b5049;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		text-decoration: none;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.viewport {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.page {
+		position: relative;
+		will-change: transform;
+	}
+
+	.page img {
+		width: 100%;
+		height: auto;
+	}
+
+	.mark {
+		position: absolute;
+		border-radius: 4px;
+		background: rgb(251 228 106 / 0.35);
+		box-shadow: 0 0 0 2px #e2bf2c;
+		opacity: 0;
+		transform: scaleX(0.4);
+		transform-origin: 0 50%;
+		transition:
+			opacity 0.4s ease,
+			transform 0.6s var(--ease-out);
+	}
+
+	.mark.is-on {
+		opacity: 1;
+		transform: none;
+	}
+
+	.tag {
+		position: absolute;
+		right: 0.5rem;
+		top: 50%;
+		translate: 0 -50%;
+		padding: 0.35em 0.7em;
+		background: var(--tinta);
+		color: #fff;
+		border-radius: 999px;
+		font-size: clamp(0.625rem, 0.5rem + 0.35vw, 0.8125rem);
+		font-weight: 500;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+	.button {
+		margin-top: 0.75rem;
+		padding: 0.9em 1.4em;
+		background: var(--fg);
+		color: var(--bg);
+		text-decoration: none;
+		font-weight: 500;
+		border-radius: 999px;
+		transition: transform 0.2s var(--ease-out);
+	}
+
+	.button:hover {
+		transform: translateY(-2px);
+	}
+
+	@media (max-width: 900px) {
+		.feed {
+			padding-left: 0;
+		}
+
+		.paper {
+			width: 100%;
+			padding-inline: 2rem;
+		}
+
+		.notes {
+			top: auto;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			width: auto;
+			padding: 1.25rem var(--gutter) 4rem;
+			background: var(--bg);
+			box-shadow: 0 -1px 0 rgb(0 0 0 / 0.1);
+			translate: none;
+		}
+
+		.notes:not(:has(.is-on)) {
+			visibility: hidden;
+		}
+
+		.cta {
+			grid-template-columns: 1fr;
+			grid-template-rows: auto auto;
+			align-content: center;
+			gap: 1.5rem;
+			padding-block: 9vh 8vh;
+		}
+
+		.cta-text {
+			order: 2;
+			gap: 1.25rem;
+		}
+
+		.cta-text .stack p {
+			max-width: none;
+			font-size: 1.25rem;
+		}
+
+		.browser {
+			--rise: 5vh;
+			height: 46vh;
+		}
+	}
+
+	html:not(.js) .feed,
+	html:not(.js) .notes,
+	html:not(.js) .cta,
+	html:not(.js) .intro {
+		position: relative;
+		inset: auto;
+	}
+</style>
