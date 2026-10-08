@@ -38,7 +38,7 @@ const words = term.map((line) =>
 	<div class="stage">
 		<div class="grid" aria-hidden="true"></div>
 
-		<figure class="listing">
+		<figure class="listing still">
 			<figcaption class="listing-head mono">
 				<span>LUMINARY 099</span>
 				<a href={href} target="_blank" rel="noopener">{file}</a>
@@ -149,6 +149,10 @@ const words = term.map((line) =>
 		return { row, parts, full, len, start, shown: -1 };
 	});
 
+	// Once every letter is upright, the wobble has nothing left to do
+	const term = $('.term', scene)!;
+	onProgress(scene, (p) => term.classList.toggle('is-upright', p >= 0.58));
+
 	let active = rows[0];
 	let lastTyped = -1;
 	let idle = 0;
@@ -195,14 +199,7 @@ const words = term.map((line) =>
 </script>
 
 <style>
-	@property --jig {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 0;
-	}
-
 	.stage {
-		--k-all: clamp(0, calc((var(--p, 1) - 0.3) / 0.28), 1);
 		display: grid;
 		grid-template-rows: 1fr auto;
 		align-items: center;
@@ -216,7 +213,7 @@ const words = term.map((line) =>
 		background:
 			linear-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px) 0 0 / 2rem 2rem,
 			linear-gradient(90deg, rgb(255 255 255 / 0.07) 1px, transparent 1px) 0 0 / 2rem 2rem;
-		opacity: var(--k-all);
+		opacity: clamp(0, calc((var(--p, 1) - 0.3) / 0.28), 1);
 	}
 
 	.term {
@@ -236,21 +233,38 @@ const words = term.map((line) =>
 		white-space: nowrap;
 	}
 
+	/* Typed, the letters' values don't have to be parsed again on every restyle */
+	@property --k {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+	@property --wobble {
+		syntax: '<angle>';
+		inherits: true;
+		initial-value: 0deg;
+	}
+
+	/* The wobble animates `rotate`, which the browser can run on the compositor; it stops once the term is upright */
 	.l {
 		--k: clamp(0, calc((var(--p, 1) - 0.3 - var(--d) * 0.16) / 0.12), 1);
+		--wobble: calc(9deg * (1 - var(--k)));
 		display: inline-block;
 		font-weight: calc(300 + 300 * var(--k));
-		transform: translateY(calc(var(--y) * (1 - var(--k))))
-			rotate(calc((var(--r) + var(--jig) * 9deg) * (1 - var(--k))));
+		transform: translateY(calc(var(--y) * (1 - var(--k)))) rotate(calc(var(--r) * (1 - var(--k))));
 		animation: jig 0.42s ease-in-out var(--jd) infinite alternate;
+	}
+
+	.is-upright .l {
+		animation: none;
 	}
 
 	@keyframes jig {
 		from {
-			--jig: -1;
+			rotate: calc(-1 * var(--wobble));
 		}
 		to {
-			--jig: 1;
+			rotate: var(--wobble);
 		}
 	}
 
