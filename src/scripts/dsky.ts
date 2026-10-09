@@ -15,24 +15,31 @@ export interface DskyState {
 
 /** Drives a DSKY rendered by src/components/Dsky.astro */
 export function createDsky(root: HTMLElement) {
-	const fields = new Map<Field, HTMLElement>();
-	$$('[data-field]', root).forEach((el) => fields.set(el.dataset.field as Field, el));
+	// The registers are rewritten on every scroll frame: the cells are looked up once,
+	// and only the digits that change touch the DOM
+	const fields = new Map<Field, { sign: HTMLElement | null; cells: HTMLElement[] }>();
+	$$('[data-field]', root).forEach((el) =>
+		fields.set(el.dataset.field as Field, { sign: $('.sign', el), cells: $$('.d:not(.sign)', el) }),
+	);
 	const lamps = $$('[data-lamp]', root);
 	const acty = $('[data-acty]', root);
 	let actyTimer = 0;
 
+	const write = (el: HTMLElement, key: 'd' | 's', value: string) => {
+		if (el.dataset[key] !== value) el.dataset[key] = value;
+	};
+
 	function set(field: Field, value: string) {
-		const el = fields.get(field);
-		if (!el) return;
-		const sign = $('.sign', el);
+		const target = fields.get(field);
+		if (!target) return;
+		const { sign, cells } = target;
 		let digits = value;
 		if (sign) {
-			sign.dataset.s = /^[+-]/.test(value) ? value[0] : '';
+			write(sign, 's', /^[+-]/.test(value) ? value[0] : '');
 			digits = value.replace(/^[+-]/, '');
 		}
-		const cells = $$('.d:not(.sign)', el);
 		const padded = digits.padStart(cells.length, ' ').slice(-cells.length);
-		cells.forEach((cell, i) => (cell.dataset.d = padded[i]));
+		cells.forEach((cell, i) => write(cell, 'd', padded[i]));
 	}
 
 	function show(state: DskyState) {
@@ -44,12 +51,25 @@ export function createDsky(root: HTMLElement) {
 		}
 	}
 
-	/** COMP ACTY blinks while the computer is working */
-	function computing(on: boolean) {
+	// COMP ACTY only blinks while the DSKY is on screen: the scene leaves it "computing"
+	// when the reader scrolls past it
+	let working = false;
+	let onScreen = false;
+	const blink = () => {
 		window.clearInterval(actyTimer);
 		acty?.classList.remove('is-lit');
-		if (!on || reducedMotion) return;
+		if (!working || !onScreen || reducedMotion) return;
 		actyTimer = window.setInterval(() => acty?.classList.toggle('is-lit', Math.random() > 0.45), 90);
+	};
+	new IntersectionObserver(([entry]) => {
+		onScreen = entry.isIntersecting;
+		blink();
+	}).observe(root);
+
+	/** COMP ACTY blinks while the computer is working */
+	function computing(on: boolean) {
+		working = on;
+		blink();
 	}
 
 	/** Presses a sequence of keys, as the astronaut would */

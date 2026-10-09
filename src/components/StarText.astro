@@ -55,6 +55,8 @@ const words = text.split(' ').map((word) =>
 			for (const letter of letters) {
 				const t = Math.round(clamp((p - start - letter.d * spread) / dur) * 1000) / 1000;
 				if (t === letter.t) continue;
+				const moving = t > 0 && t < 1;
+				if (moving !== (letter.t > 0 && letter.t < 1)) letter.el.classList.toggle('is-moving', moving);
 				letter.t = t;
 				letter.el.style.setProperty('--t', String(t));
 			}
@@ -150,8 +152,12 @@ const words = text.split(' ').map((word) =>
 				calc(var(--dy, 0px) * (1 - var(--m)) + var(--ay, 0px) * var(--arc))
 			)
 			scale(calc(1 + 1.6 * var(--f)));
-		will-change: transform;
 		pointer-events: none;
+	}
+
+	/* A layer of its own only while travelling: resting, a hundred stars would be a hundred layers */
+	.l.is-moving::before {
+		will-change: transform;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

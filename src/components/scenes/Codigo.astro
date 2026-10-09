@@ -148,7 +148,7 @@ const notes = excerpts.flatMap((excerpt) =>
 
 <script>
 	import { $, $$ } from '../../scripts/dom';
-	import { onProgress, segment, viewportHeight } from '../../scripts/scroll';
+	import { onProgress, onResize, segment, viewportHeight } from '../../scripts/scroll';
 
 	const scene = $('[data-scene="codigo"]')!;
 	const paper = $('[data-paper]', scene)!;
@@ -157,22 +157,44 @@ const notes = excerpts.flatMap((excerpt) =>
 	const groups = $$('[data-note]', scene).map((note) => ({
 		note,
 		lines: $$(`[data-hl="${note.dataset.note}"]`, scene),
+		top: 0,
+		bottom: 0,
 	}));
 
+	// Highlights and transforms don't move anything in the layout: the positions are read once
+	// per resize, not on every frame right after --p has invalidated the scene's style
+	let layout: { paper: number; view: number; page: number; signature: number } | undefined;
+	const measure = () => {
+		for (const group of groups) {
+			group.top = group.lines[0].offsetTop;
+			group.bottom = group.lines[group.lines.length - 1].offsetTop;
+		}
+		const mh = marks.get('mh')!;
+		layout = {
+			paper: paper.offsetHeight,
+			view: page.parentElement!.clientHeight,
+			page: page.offsetHeight,
+			signature: mh.offsetTop + mh.offsetHeight / 2,
+		};
+		return layout;
+	};
+	const invalidate = () => (layout = undefined);
+	onResize(invalidate);
+	document.fonts?.ready.then(invalidate);
+
 	onProgress(scene, (p) => {
+		const { paper: paperHeight, view: viewHeight, page: pageHeight, signature: mh } = layout ?? measure();
 		const vh = viewportHeight();
 		const readLine = vh * 0.42;
 		const start = vh * 0.92;
-		const end = -paper.offsetHeight - vh * 0.05;
+		const end = -paperHeight - vh * 0.05;
 		const y = start + (end - start) * segment(p, 0.03, 0.72);
 		paper.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
 
 		const read = readLine - y;
 		let active: (typeof groups)[number] | undefined;
 		for (const group of groups) {
-			const first = group.lines[0];
-			const last = group.lines[group.lines.length - 1];
-			if (first.offsetTop <= read + 24 && last.offsetTop + vh * 0.16 >= read) active = group;
+			if (group.top <= read + 24 && group.bottom + vh * 0.16 >= read) active = group;
 		}
 		for (const group of groups) {
 			const on = group === active;
@@ -182,9 +204,7 @@ const notes = excerpts.flatMap((excerpt) =>
 		}
 
 		// The repository window: first the two folders, then it scrolls down to Margaret's signature
-		const viewHeight = page.parentElement!.clientHeight;
-		const pageHeight = page.offsetHeight;
-		const signature = (marks.get('mh')!.offsetTop + marks.get('mh')!.offsetHeight / 2) - viewHeight * 0.5;
+		const signature = mh - viewHeight * 0.5;
 		const target = Math.min(Math.max(signature, 0), pageHeight - viewHeight);
 		const s = segment(p, 0.86, 0.95);
 		page.style.transform = `translate3d(0, ${(-target * s * s * (3 - 2 * s)).toFixed(1)}px, 0)`;

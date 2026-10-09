@@ -24,6 +24,8 @@ interface Scene {
 	top: number;
 	height: number;
 	far?: boolean;
+	/** Already rendered once, so coming near again only costs an update */
+	warm?: boolean;
 }
 
 export const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -104,6 +106,7 @@ function frame() {
 			scene.el.classList.toggle('is-far', far);
 		}
 		if (far) continue;
+		scene.warm = true;
 
 		const span = scene.height - vh;
 		const p = span > 0 ? clamp(-top / span) : top <= 0 ? 1 : 0;
@@ -118,6 +121,14 @@ function frame() {
 	}
 
 	if (active) applyChrome(active);
+	for (const fn of frameListeners) fn(y);
+}
+
+const frameListeners: ((y: number) => void)[] = [];
+
+/** Runs `fn` on every frame the page moves, with the scroll position read before any write */
+export function onFrame(fn: (y: number) => void) {
+	frameListeners.push(fn);
 }
 
 /** The theme and year are set by the last text that has already started, or by the scene itself */
@@ -159,7 +170,28 @@ export function onResize(fn: () => void) {
 	resizeListeners.push(fn);
 }
 
-window.addEventListener('scroll', queue, { passive: true });
+// The first time a scene renders, its whole subtree is styled and laid out from scratch: tens of
+// milliseconds on a phone, all in the frame it comes within reach. Done ahead of time while the
+// page is idle, one scene per idle period and the nearest first, it later only costs an update
+let lastScroll = 0;
+const idle = (fn: () => void) =>
+	window.requestIdleCallback
+		? window.requestIdleCallback(fn, { timeout: 4000 })
+		: window.setTimeout(() => (performance.now() - lastScroll < 300 ? idle(fn) : fn()), 300);
+
+function warm() {
+	const y = window.scrollY;
+	const cold = scenes.filter((scene) => !scene.warm);
+	if (!cold.length) return;
+	const scene = cold.reduce((a, b) => (Math.abs(b.top - y) < Math.abs(a.top - y) ? b : a));
+	scene.warm = true;
+	scene.el.classList.remove('is-far');
+	scene.el.lastElementChild?.getBoundingClientRect();
+	scene.el.classList.add('is-far');
+	idle(warm);
+}
+
+window.addEventListener('scroll', () => ((lastScroll = performance.now()), queue()), { passive: true });
 window.addEventListener('resize', () => {
 	if (window.innerWidth === vw && probe.offsetHeight === vh) return;
 	measure();
@@ -170,3 +202,5 @@ window.addEventListener('resize', () => {
 measure();
 frame();
 root.classList.add('scenes-ready');
+if (document.readyState === 'complete') idle(warm);
+else window.addEventListener('load', () => idle(warm), { once: true });
