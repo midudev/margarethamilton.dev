@@ -1,5 +1,6 @@
 ---
 import { Font } from 'astro:assets';
+import Autoplay from '../components/Autoplay.astro';
 import { getLang, homePath, languages, translator, type Lang } from '../i18n';
 
 const lang = getLang(Astro);
@@ -142,6 +143,7 @@ const jsonLd = {
 		</nav>
 		<slot />
 		<p class="year" aria-hidden="true"><span data-year-display>1936</span></p>
+		<Autoplay />
 	</body>
 </html>
 

@@ -1,0 +1,202 @@
+---
+import { getLang, translator } from '../i18n';
+
+const t = translator(getLang(Astro));
+---
+
+<div
+	class="autoplay"
+	data-autoplay
+	data-label-play={t({ es: 'Ver como película', en: 'Play as a film' })}
+	data-label-pause={t({ es: 'Pausa', en: 'Pause' })}
+	data-label-replay={t({ es: 'Volver a ver', en: 'Watch again' })}
+>
+	<button type="button" class="play" data-autoplay-toggle aria-pressed="false">
+		<svg class="icon icon-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"></path></svg>
+		<svg class="icon icon-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z"></path></svg>
+		<span data-autoplay-label>{t({ es: 'Ver como película', en: 'Play as a film' })}</span>
+	</button>
+	<button type="button" class="speed" data-autoplay-speed title={t({ es: 'Velocidad', en: 'Speed' })}>1×</button>
+</div>
+
+<script>
+	import { $ } from '../scripts/dom';
+	import { onFrame, onResize, viewportHeight } from '../scripts/scroll';
+
+	// Viewport heights per second at 1×: the whole story takes about three minutes
+	const BASE_SPEED = 0.4;
+	const SPEEDS = [1, 2, 0.5];
+
+	const root = $('[data-autoplay]')!;
+	const toggle = $<HTMLButtonElement>('[data-autoplay-toggle]', root)!;
+	const label = $('[data-autoplay-label]', root)!;
+	const speedButton = $<HTMLButtonElement>('[data-autoplay-speed]', root)!;
+	const lastScene = Array.from(document.querySelectorAll<HTMLElement>('[data-scene]')).at(-1)!;
+
+	let playing = false;
+	let speedIndex = 0;
+	let raf = 0;
+	let last = 0;
+	let y = 0;
+
+	// Where the film ends: the last scene fully played, before the credits. Read once per resize:
+	// render() runs on every scrolled frame, and reading the layout there would force it each time
+	let endY: number | undefined;
+	const end = () => (endY ??= lastScene.offsetTop + lastScene.offsetHeight - viewportHeight());
+	const atEnd = (top = window.scrollY) => top >= end() - 2;
+	onResize(() => (endY = undefined));
+
+	function render(top?: number) {
+		root.classList.toggle('is-playing', playing);
+		const pressed = String(playing);
+		if (toggle.getAttribute('aria-pressed') !== pressed) toggle.setAttribute('aria-pressed', pressed);
+		const { labelPlay, labelPause, labelReplay } = root.dataset;
+		const text = (playing ? labelPause : atEnd(top) ? labelReplay : labelPlay) ?? '';
+		if (label.textContent !== text) label.textContent = text;
+		const speed = `${SPEEDS[speedIndex]}×`;
+		if (speedButton.textContent !== speed) speedButton.textContent = speed;
+	}
+
+	function step(now: number) {
+		// The user moved the page some other way (scrollbar, find in page, a link…)
+		if (Math.abs(window.scrollY - y) > 3) return stop();
+
+		// Capped so a hidden tab doesn't jump ahead when it comes back
+		const dt = Math.min(now - last, 100) / 1000;
+		last = now;
+		y = Math.min(y + BASE_SPEED * SPEEDS[speedIndex] * viewportHeight() * dt, end());
+		window.scrollTo({ top: y, behavior: 'instant' });
+		if (y >= end()) return stop();
+		raf = requestAnimationFrame(step);
+	}
+
+	function play() {
+		if (atEnd()) window.scrollTo({ top: 0, behavior: 'instant' });
+		playing = true;
+		y = window.scrollY;
+		last = performance.now();
+		raf = requestAnimationFrame(step);
+		render();
+	}
+
+	function stop() {
+		if (!playing) return;
+		playing = false;
+		cancelAnimationFrame(raf);
+		render();
+	}
+
+	toggle.addEventListener('click', () => (playing ? stop() : play()));
+	speedButton.addEventListener('click', () => {
+		speedIndex = (speedIndex + 1) % SPEEDS.length;
+		render();
+	});
+
+	// Any manual scrolling hands control back to the user
+	window.addEventListener('wheel', stop, { passive: true });
+	window.addEventListener('touchstart', stop, { passive: true });
+	window.addEventListener('keydown', (event) => {
+		if (root.contains(event.target as Node)) return;
+		if (event.key === 'Escape' || event.key.startsWith('Arrow') || /^(Page|Home|End| )/.test(event.key)) stop();
+	});
+	document.addEventListener('visibilitychange', () => {
+		if (document.hidden) stop();
+	});
+	// Reading window.scrollY in a scroll listener would force a style and layout update there,
+	// on top of the one the frame does: the scene engine passes the position it already read
+	onFrame((top) => {
+		if (!playing) render(top);
+	});
+
+	render();
+</script>
+
+<style>
+	.autoplay {
+		position: fixed;
+		right: var(--gutter);
+		bottom: clamp(0.75rem, 3vh, 2rem);
+		z-index: 50;
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		font-family: var(--font-mono);
+		font-size: 0.8125rem;
+	}
+
+	/* Without the scene engine there's nothing to play */
+	html:not(.js) .autoplay {
+		display: none;
+	}
+
+	button {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.4rem 0.75rem;
+		background: color-mix(in srgb, var(--bg) 70%, transparent);
+		color: var(--fg);
+		border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent);
+		border-radius: 999px;
+		font: inherit;
+		cursor: pointer;
+		opacity: 0.75;
+		transition:
+			opacity 0.2s,
+			color 900ms ease,
+			background-color 900ms ease,
+			border-color 900ms ease;
+	}
+
+	/* Fixed over a page that moves on every frame, the blur has to be redone on every frame:
+	   phones get a more opaque background instead */
+	@media (hover: hover) and (pointer: fine) {
+		button {
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
+		}
+	}
+
+	@media not ((hover: hover) and (pointer: fine)) {
+		button {
+			background: color-mix(in srgb, var(--bg) 88%, transparent);
+		}
+	}
+
+	button:hover,
+	.is-playing button {
+		opacity: 1;
+	}
+
+	.icon {
+		width: 0.75rem;
+		height: 0.75rem;
+		fill: currentColor;
+	}
+
+	.icon-pause,
+	.is-playing .icon-play {
+		display: none;
+	}
+
+	.is-playing .icon-pause {
+		display: block;
+	}
+
+	.speed {
+		min-width: 3.25rem;
+		justify-content: center;
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* The speed only matters while the film plays */
+	.autoplay:not(.is-playing) .speed {
+		display: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		button {
+			transition: none;
+		}
+	}
+</style>
