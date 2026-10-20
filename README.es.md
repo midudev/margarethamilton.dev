@@ -8,7 +8,7 @@
 
 Documentación disponible en: 🌐 [English](README.md) | 🇪🇸 [Español](README.es.md)
 
-![Margaret Hamilton sobre la Tierra que se eleva por encima del horizonte lunar](.github/screenshots/01-hero.jpg)
+![Margaret Hamilton sobre la Tierra que se eleva por encima del horizonte lunar](.github/screenshots/es/01-inicio.jpg)
 
 </div>
 
@@ -39,32 +39,32 @@ Este sitio cuenta su historia en un recorrido continuo, desde Paoli, Indiana, en
 
 <table>
   <tr>
-    <td width="50%"><img src=".github/screenshots/02-milestones.jpg" alt="Hitos perforados con código Hollerith en tarjetas de 80 columnas" /></td>
-    <td width="50%"><img src=".github/screenshots/03-dsky.jpg" alt="Un DSKY funcional que cuenta la historia del incidente P01 en el Apolo 8" /></td>
+    <td width="50%"><img src=".github/screenshots/es/02-hitos.jpg" alt="Hitos perforados con código Hollerith en tarjetas de 80 columnas" /></td>
+    <td width="50%"><img src=".github/screenshots/es/03-dsky.jpg" alt="Un DSKY funcional que cuenta la historia del incidente P01 en el Apolo 8" /></td>
   </tr>
   <tr>
     <td align="center"><sub>Hitos en tarjetas perforadas de 80 columnas</sub></td>
     <td align="center"><sub>Un DSKY funcional y el incidente P01</sub></td>
   </tr>
   <tr>
-    <td><img src=".github/screenshots/04-tower.jpg" alt="Margaret Hamilton en 1969 junto a los listados impresos del software del Apolo" /></td>
-    <td><img src=".github/screenshots/05-program-alarm.jpg" alt="Alarma de programa: el DSKY durante el descenso del Apolo 11" /></td>
+    <td><img src=".github/screenshots/es/04-torre.jpg" alt="Margaret Hamilton en 1969 junto a los listados impresos del software del Apolo" /></td>
+    <td><img src=".github/screenshots/es/05-alarma-de-programa.jpg" alt="Alarma de programa: el DSKY durante el descenso del Apolo 11" /></td>
   </tr>
   <tr>
     <td align="center"><sub>MIT, 1969: la torre de listados</sub></td>
     <td align="center"><sub>"Alarma de programa".</sub></td>
   </tr>
   <tr>
-    <td><img src=".github/screenshots/06-rope-memory.jpg" alt="Un hilo que atraviesa núcleos magnéticos para escribir 1202 en binario" /></td>
-    <td><img src=".github/screenshots/07-source-code.jpg" alt="Fragmentos del código fuente real de Luminary 099" /></td>
+    <td><img src=".github/screenshots/es/06-memoria-de-nucleos.jpg" alt="Un hilo que atraviesa núcleos magnéticos para escribir 1202 en binario" /></td>
+    <td><img src=".github/screenshots/es/07-codigo-fuente.jpg" alt="Fragmentos del código fuente real de Luminary 099" /></td>
   </tr>
   <tr>
     <td align="center"><sub>Memoria de núcleos cableados que escribe <code>1202</code></sub></td>
     <td align="center"><sub>El código fuente real del Apolo 11</sub></td>
   </tr>
   <tr>
-    <td><img src=".github/screenshots/08-software-engineering.jpg" alt="Las palabras ingeniería de software tambaleándose sobre un fondo azul" /></td>
-    <td><img src=".github/screenshots/09-thank-you.jpg" alt="Gracias, Margaret, escrito sobre el horizonte lunar" /></td>
+    <td><img src=".github/screenshots/es/08-ingenieria-de-software.jpg" alt="Las palabras ingeniería de software tambaleándose sobre un fondo azul" /></td>
+    <td><img src=".github/screenshots/es/09-gracias.jpg" alt="Gracias, Margaret, escrito sobre el horizonte lunar" /></td>
   </tr>
   <tr>
     <td align="center"><sub>"Ingeniería de software", antes una broma</sub></td>

@@ -8,7 +8,7 @@
 
 Documentation available in: 🌐 [English](README.md) | 🇪🇸 [Español](README.es.md)
 
-![Margaret Hamilton, over the Earth rising above the lunar horizon](.github/screenshots/01-hero.jpg)
+![Margaret Hamilton, over the Earth rising above the lunar horizon](.github/screenshots/en/01-hero.jpg)
 
 </div>
 
@@ -38,32 +38,32 @@ This site tells her story as one continuous scroll, from Paoli, Indiana, in 1936
 
 <table>
   <tr>
-    <td width="50%"><img src=".github/screenshots/02-milestones.jpg" alt="Milestones punched as Hollerith code on 80-column cards" /></td>
-    <td width="50%"><img src=".github/screenshots/03-dsky.jpg" alt="A working DSKY telling the story of the P01 incident on Apollo 8" /></td>
+    <td width="50%"><img src=".github/screenshots/en/02-milestones.jpg" alt="Milestones punched as Hollerith code on 80-column cards" /></td>
+    <td width="50%"><img src=".github/screenshots/en/03-dsky.jpg" alt="A working DSKY telling the story of the P01 incident on Apollo 8" /></td>
   </tr>
   <tr>
     <td align="center"><sub>Milestones on 80-column punch cards</sub></td>
     <td align="center"><sub>A working DSKY and the P01 incident</sub></td>
   </tr>
   <tr>
-    <td><img src=".github/screenshots/04-tower.jpg" alt="Margaret Hamilton in 1969 next to the printed listings of the Apollo software" /></td>
-    <td><img src=".github/screenshots/05-program-alarm.jpg" alt="Program alarm: the DSKY during the Apollo 11 descent" /></td>
+    <td><img src=".github/screenshots/en/04-tower.jpg" alt="Margaret Hamilton in 1969 next to the printed listings of the Apollo software" /></td>
+    <td><img src=".github/screenshots/en/05-program-alarm.jpg" alt="Program alarm: the DSKY during the Apollo 11 descent" /></td>
   </tr>
   <tr>
     <td align="center"><sub>MIT, 1969: the tower of listings</sub></td>
     <td align="center"><sub>“Program alarm.”</sub></td>
   </tr>
   <tr>
-    <td><img src=".github/screenshots/06-rope-memory.jpg" alt="A wire through magnetic cores spelling 1202 in binary" /></td>
-    <td><img src=".github/screenshots/07-source-code.jpg" alt="Excerpts of the real Luminary 099 source code" /></td>
+    <td><img src=".github/screenshots/en/06-rope-memory.jpg" alt="A wire through magnetic cores spelling 1202 in binary" /></td>
+    <td><img src=".github/screenshots/en/07-source-code.jpg" alt="Excerpts of the real Luminary 099 source code" /></td>
   </tr>
   <tr>
     <td align="center"><sub>Rope memory spelling <code>1202</code></sub></td>
     <td align="center"><sub>The real Apollo 11 source code</sub></td>
   </tr>
   <tr>
-    <td><img src=".github/screenshots/08-software-engineering.jpg" alt="The words software engineering wobbling on a blue background" /></td>
-    <td><img src=".github/screenshots/09-thank-you.jpg" alt="Thank you, Margaret, written over the lunar horizon" /></td>
+    <td><img src=".github/screenshots/en/08-software-engineering.jpg" alt="The words software engineering wobbling on a blue background" /></td>
+    <td><img src=".github/screenshots/en/09-thank-you.jpg" alt="Thank you, Margaret, written over the lunar horizon" /></td>
   </tr>
   <tr>
     <td align="center"><sub>“Software engineering”, once a joke</sub></td>
