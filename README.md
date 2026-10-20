@@ -6,6 +6,8 @@
 
 [**Visit the site →**](https://margarethamilton.dev/en/) · [Español](https://margarethamilton.dev/) · [English](https://margarethamilton.dev/en/)
 
+Documentation available in: 🌐 [English](README.md) | 🇪🇸 [Español](README.es.md)
+
 ![Margaret Hamilton, over the Earth rising above the lunar horizon](.github/screenshots/01-hero.jpg)
 
 </div>
