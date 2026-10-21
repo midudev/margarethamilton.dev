@@ -102,9 +102,18 @@ const t = translator(getLang(Astro));
 		render();
 	});
 
-	// Any manual scrolling hands control back to the user
+	// Any manual scrolling hands control back to the user, but a touch that starts
+	// on the controls belongs to them: stopping here would hide the speed button
+	// and regrow the play button under the finger before its click is dispatched
 	window.addEventListener('wheel', stop, { passive: true });
-	window.addEventListener('touchstart', stop, { passive: true });
+	window.addEventListener(
+		'touchstart',
+		(event) => {
+			if (root.contains(event.target as Node)) return;
+			stop();
+		},
+		{ passive: true },
+	);
 	window.addEventListener('keydown', (event) => {
 		if (root.contains(event.target as Node)) return;
 		if (event.key === 'Escape' || event.key.startsWith('Arrow') || /^(Page|Home|End| )/.test(event.key)) stop();
