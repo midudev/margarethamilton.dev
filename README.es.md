@@ -21,19 +21,18 @@ Este sitio cuenta su historia en un recorrido continuo, desde Paoli, Indiana, en
 
 ## Escenas
 
-
 | # | Escena | Qué sucede |
 | :-- | :-- | :-- |
 | 1 | **Apertura** | Las estrellas sobre el amanecer de la Tierra se colocan en su sitio y se convierten en las letras de su cita. |
 | 2 | **Hitos** | Sus primeros años (Earlham, Edward Lorenz, SAGE, Apolo) perforados con código Hollerith real en tarjetas perforadas de 80 columnas, como las que se usaban en el MIT. |
 | 3 | **Lauren** | Un DSKY funcional recrea la historia de su hija bloqueando el simulador con P01, el error que Jim Lovell repitió en el Apolo 8 y el nacimiento de la programación defensiva. |
 | 4 | **La torre** | La famosa foto de 1969 junto a los listados, apilados carpeta a carpeta con los nombres reales de los módulos de Luminary 099 y Comanche 055. |
-| 5 | **La alarma 1202** | El descenso del Apolo 11: las alarmas de programa en el DSKY, “We’re Go on that alarm” and “The Eagle has landed.” |
+| 5 | **La alarma 1202** | El descenso del Apolo 11: las alarmas de programa en el DSKY, “We’re Go on that alarm” y “The Eagle has landed.” |
 | 6 | **Memoria de núcleos cableados** | Un hilo atraviesa núcleos magnéticos para escribir `1202` en binario: software que se tejía literalmente a mano. |
-| 7 | **El código** | Fragmentos reales de Luminary 099 (`BURN_BABY_BURN`, `PINBALL_GAME_BUTTONS_AND_LIGHTS`, "PLEASE CRANK THE SILLY THING AROUND") enlazados a sus líneas exactas en GitHub, que terminan con su firma en el README. |
+| 7 | **El código** | Fragmentos reales de Luminary 099 (`BURN_BABY_BURN`, `PINBALL_GAME_BUTTONS_AND_LIGHTS`, “PLEASE CRANK THE SILLY THING AROUND”) enlazados a sus líneas exactas en GitHub, que terminan con su firma en el README. |
 | 8 | **Ingeniería de software** | Las dos palabras se tambalean como la broma que fueron en su día, luego se enderezan y ganan peso al desplazarte, hasta dar nombre a una profesión. |
 | 9 | **Legado** | Higher Order Software, Hamilton Technologies, el Premio al Acto Espacial Excepcional de la NASA y la Medalla Presidencial de la Libertad. |
-| 10 | **Cierre** | "Gracias, Margaret". |
+| 10 | **Cierre** | “Gracias, Margaret.” |
 
 ## Capturas de pantalla
 
@@ -52,7 +51,7 @@ Este sitio cuenta su historia en un recorrido continuo, desde Paoli, Indiana, en
   </tr>
   <tr>
     <td align="center"><sub>MIT, 1969: la torre de listados</sub></td>
-    <td align="center"><sub>"Alarma de programa".</sub></td>
+    <td align="center"><sub>“Alarma de programa.”</sub></td>
   </tr>
   <tr>
     <td><img src=".github/screenshots/es/06-memoria-de-nucleos.jpg" alt="Un hilo que atraviesa núcleos magnéticos para escribir 1202 en binario" /></td>
@@ -67,7 +66,7 @@ Este sitio cuenta su historia en un recorrido continuo, desde Paoli, Indiana, en
     <td><img src=".github/screenshots/es/09-gracias.jpg" alt="Gracias, Margaret, escrito sobre el horizonte lunar" /></td>
   </tr>
   <tr>
-    <td align="center"><sub>"Ingeniería de software", antes una broma</sub></td>
+    <td align="center"><sub>“Ingeniería de software”, antes una broma</sub></td>
     <td align="center"><sub>Gracias, Margaret.</sub></td>
   </tr>
 </table>
